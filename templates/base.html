@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} home {% endblock title %}</title>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'accounts:home' %}">ホーム画面</a>
+    </nav>
+    {% block content %}
+    {% endblock %}
+</body>
+</html>
