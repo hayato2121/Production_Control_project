@@ -13,7 +13,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 #作業一覧
 class ReportListView(LoginRequiredMixin, ListView):
     model = Report
-    template_name = os.path.join('daily_report', 'report/report_list.html')
+    template_name = os.path.join('report', 'report_list.html')
 
     def get_queryset(self):
-        return Report.objects.filter(user=self.request.user)
+        user_obj = self.request.user
+        if user_obj.is_authenticated:
+             qs = Report.objects.filter(user=user_obj)
+        else:
+            qs = Report.objects.none()
+        return qs

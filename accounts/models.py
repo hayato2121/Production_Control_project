@@ -8,7 +8,8 @@ from django.urls import reverse_lazy
 
 # Create your models here.
 
-#部署テーブル---------------------------------------------------------------
+#部署テーブル---------------------------------------------------------------------------
+
 class Departments(models.Model):
     name = models.CharField(max_length=50, verbose_name="部署")
 
@@ -43,6 +44,8 @@ class UsersManager(BaseUserManager):
         user.is_superuser = True
         user.save(using=self._db)
         return user
+    
+    
     
 
 

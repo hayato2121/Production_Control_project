@@ -7,6 +7,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 
 from .forms import LoginUserForm, RegistUserForm
 
+
 class HomeView(TemplateView):
     template_name = 'home.html'
     
@@ -19,3 +20,5 @@ class LoginUserView(LoginView):
 class RegistUserView(CreateView):
     template_name = 'regist_user.html'
     form_class = RegistUserForm
+
+  

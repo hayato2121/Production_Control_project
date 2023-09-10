@@ -15,7 +15,7 @@ class RegistUserForm(forms.ModelForm):
     birthday = forms.DateField(label='生年月日')
     phone = forms.IntegerField(label='緊急連絡先番号',required=False)
     email = forms.EmailField(label='連絡先メールアドレス',required=False)
-    department = forms.ChoiceField(choices=[(item.pk, item) for item in Departments.objects.all()],
+    department = forms.ModelChoiceField(queryset=Departments.objects,
         label='所属部署', 
         required=True,)
     password = forms.CharField(label='パスワード',widget=forms.PasswordInput())
