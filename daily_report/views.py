@@ -2,7 +2,7 @@ from django.shortcuts import render
 
 from django.views.generic.list import ListView
 
-from accounts.models import Users
+from daily_report.models import Report
 import os
 
 #ログイン状態
@@ -12,10 +12,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 #作業一覧
 class ReportListView(LoginRequiredMixin, ListView):
-    model = Users
+    model = Report
     template_name = os.path.join('daily_report', 'report/report_list.html')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['user_department_name'] = self.request.GET.get('user_department_name', None)
-        return context
+    def get_queryset(self):
+        return Report.objects.filter(user=self.request.user)
