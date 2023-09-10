@@ -8,6 +8,7 @@
 <body>
     <nav>
         <a href="{% url 'accounts:home' %}">ホーム画面</a>
+        <h1>{{ request.user.username }}さん</h1>
     </nav>
     {% block content %}
     {% endblock %}

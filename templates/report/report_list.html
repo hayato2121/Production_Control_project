@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>{{ self.request.user_name}}</h1>
+<h1>所属部署:{{ user.department.name }}</h1>
 {% endblock %}
