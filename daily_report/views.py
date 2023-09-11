@@ -4,23 +4,56 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import (
     UpdateView, DeleteView, CreateView
 )
+from django.views.generic.base import TemplateView
 
 from django.urls import reverse_lazy
 
 from daily_report.models import Report
 import os
 
-from .forms import ReportTaskForm
+from .forms import ReportStartForm
 
 #ログイン状態
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
+    
+#作業start
+class ReportStartView(LoginRequiredMixin, CreateView):
+    template_name = os.path.join('report', 'report_start.html')
+    form_class = ReportStartForm
+    success_url = reverse_lazy('daily_report:report_list')
+    
+
+    #sessionを使用して、一時保存
+    def form_valid(self, form):
+        session_data = {
+            'product' : form.cleaned_data['product'],
+            'business': form.cleaned_data['business'],
+        }
+        self.request.session['form_data'] = session_data
+        return super().form_valid(form)
+        
+
+#作業終了
+class ReportEndView(LoginRequiredMixin,TemplateView):
+    template_name = os.path.join('report', 'report_end.html')
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #セッションからフォームデータを取得
+        session_data = self.request.session.get('form_data',{})
+        task_data = session_data.get('product','business')
+        context['task_data'] = task_data
+        return context
+
 
 #作業一覧
 class ReportListView(LoginRequiredMixin, ListView):
     model = Report
     template_name = os.path.join('report', 'report_list.html')
+
 
     #ログインユーザーしか自分のデータを見ることができない設定
     def get_queryset(self):
@@ -31,14 +64,18 @@ class ReportListView(LoginRequiredMixin, ListView):
             qs = Report.objects.none()
         return qs
     
+
     #ユーザーデータをテンプレートに渡す
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        #作業データ
+        session_data = self.request.session.get('form_data',{})
+
+        task_data = session_data.get('product','business')
+        context['task_data'] = task_data
+
+        #ユーザーデータ
         context['user'] = self.request.user
         return context
-    
-#作業を行う
-class ReportTaskView(LoginRequiredMixin, CreateView):
-    template_name = os.path.join('report', 'report_task.html')
-    form_class = ReportTaskForm
-    success_url = reverse_lazy('daily_report:report_list')
+        

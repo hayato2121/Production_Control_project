@@ -2,4 +2,5 @@
 
 {% block content %}
 <h1>所属部署:{{ user.department.name }}</h1>
+<p><a href="{% url 'daily_report:report_start' %}">作業をスタートする</a></p>
 {% endblock %}

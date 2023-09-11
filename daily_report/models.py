@@ -4,6 +4,8 @@ from django.db import models
 from django.db import models
 from accounts.models import Users, Departments
 
+from datetime import timedelta
+
 #製品情報
 class Products(models.Model):
     name = models.CharField(max_length=255,verbose_name="製品名")
@@ -51,7 +53,6 @@ class Report(models.Model):
     user = models.ForeignKey(
         Users, on_delete=models.PROTECT,verbose_name="ユーザー"
     )
-    operation_time = models.DateTimeField(null=True,blank=True, verbose_name="作業時間")
     good_product_total = models.IntegerField(null=True,blank=True,verbose_name="優良合計数")
     bad_product_total = models.IntegerField(null=True,blank=True,verbose_name="不良合計数")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -59,6 +60,13 @@ class Report(models.Model):
 
     class Meta:
         db_table = "report"
+
+    def TaskTime(self):
+        if self.start_time and self.end_time:
+            working_hours = self.end_time - self.start_time
+            return working_hours
+        else:
+            return timedelta(seconds=0)
 
     def __str__(self):
         return self.user
