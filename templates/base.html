@@ -7,7 +7,7 @@
 </head>
 <body>
     <nav>
-        <a href="{% url 'accounts:home' %}">ホーム画面</a>
+        <a href="{% url 'daily_report:report_list' %}">ホーム画面</a>
         <h1>{{ request.user.username }}さん</h1>
     </nav>
     {% block content %}

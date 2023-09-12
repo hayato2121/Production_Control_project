@@ -19,6 +19,7 @@ class Molding(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        verbose_name = '成形品'
         db_table = 'molding'
 
     def __str__(self):
@@ -47,10 +48,11 @@ class Stock(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        verbose_name = '在庫'
         db_table = 'stock'
 
 
-#出荷
+#出荷---------------------------------------------------------------
 class Shipping(models.Model):
     stock = models.ForeignKey(
         Stock, on_delete=models.PROTECT, verbose_name='在庫情報'
@@ -63,6 +65,7 @@ class Shipping(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        verbose_name = '出荷'
         db_table = 'shipping'
 
 

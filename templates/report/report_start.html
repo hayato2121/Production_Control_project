@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1>作業開始ページ</h1>
-<form id =method="POST">
+<form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="スタートする">

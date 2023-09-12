@@ -9,7 +9,7 @@ from datetime import timedelta
 #製品情報
 class Products(models.Model):
     name = models.CharField(max_length=255,verbose_name="製品名")
-    code = models.IntegerField(verbose_name="製品コード")
+    code = models.CharField(max_length=50,verbose_name="製品コード")
     quantity = models.IntegerField(verbose_name="製品取り数")
     pictures = models.FileField(upload_to='product_pictures/',verbose_name="製品画像")
     memo = models.CharField(max_length=255,blank=True, null=True,verbose_name="製品メモ")
@@ -17,10 +17,11 @@ class Products(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        verbose_name = '製品情報'
         db_table = 'products'
 
     def __str__(self):
-        return self.name
+        return self.name + ':' + self.code 
 
 
 #業務内容
@@ -32,10 +33,11 @@ class Business(models.Model):
     business_content = models.CharField(max_length=255,verbose_name="業務内容")
 
     class Meta:
+        verbose_name = '業務内容'
         db_table = 'business'
 
     def __str__(self):
-        return self.name
+        return self.department.name + ':' + self.name
 
 
 
@@ -46,28 +48,23 @@ class Report(models.Model):
         Products, on_delete=models.PROTECT,verbose_name="製品情報"
     )
     #業務内容紐付け
-    busines = models.ForeignKey(
+    business = models.ForeignKey(
         Business, on_delete=models.PROTECT,verbose_name="業務内容"
     )
     #ユーザー情報紐付け
     user = models.ForeignKey(
         Users, on_delete=models.PROTECT,verbose_name="ユーザー"
     )
-    good_product_total = models.IntegerField(null=True,blank=True,verbose_name="優良合計数")
-    bad_product_total = models.IntegerField(null=True,blank=True,verbose_name="不良合計数")
+    good_product_total = models.IntegerField(null=True,blank=True,verbose_name="優良数")
+    bad_product_total = models.IntegerField(null=True,blank=True,verbose_name="不良数")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        verbose_name = '日報'
         db_table = "report"
 
-    def TaskTime(self):
-        if self.start_time and self.end_time:
-            working_hours = self.end_time - self.start_time
-            return working_hours
-        else:
-            return timedelta(seconds=0)
 
     def __str__(self):
-        return self.user
+        return self.created_at.strftime('%Y-%m-%d') + ':' + self.user.username + ':' + self.product.name
 

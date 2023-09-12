@@ -14,6 +14,7 @@ class Departments(models.Model):
     name = models.CharField(max_length=50, verbose_name="部署")
 
     class Meta:
+        verbose_name = '部署'
         db_table = 'departments'
 
     def __str__(self):

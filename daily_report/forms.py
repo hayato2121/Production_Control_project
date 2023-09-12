@@ -1,21 +1,34 @@
 from django import forms
 
-from .models import Products,Business,Report
+from .models import Report
+
+from datetime import datetime
 
 class ReportStartForm(forms.ModelForm):
-    product = forms.ModelChoiceField(queryset=Products.objects,
-        label='製品名', 
-        required=True,)
-    business = forms.ModelChoiceField(queryset=Business.objects,
-        label='業務内容', 
-        required=True,)
-    
     class Meta:
         model = Report
         fields = ('product', 'business')
+
+    def __init__(self,*args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(ReportStartForm, self).__init__(*args, **kwargs)
+
+    #userフィールドに自動でリクエストユーザーをする。
+    def save(self, commit=True):
+        report = super(ReportStartForm, self).save(commit=False)
+        if self.user:
+            report.user = self.user
+        if commit:
+            report.save()
+        report.save()
+        return report
+
 
 class RepoertEndForm(forms.ModelForm):
     
     class Meta:
         models = Report
-        exclude = 'product', 'business'
+
+    
+    
+        
