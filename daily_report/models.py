@@ -3,15 +3,15 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from accounts.models import Users, Departments
-
-from datetime import timedelta
+#ランダム数値
+import random 
+import string
 
 #製品情報
 class Products(models.Model):
     name = models.CharField(max_length=255,verbose_name="製品名")
     code = models.CharField(max_length=50,verbose_name="製品コード")
     quantity = models.IntegerField(verbose_name="製品取り数")
-    pictures = models.FileField(upload_to='product_pictures/',verbose_name="製品画像")
     memo = models.CharField(max_length=255,blank=True, null=True,verbose_name="製品メモ")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -55,6 +55,7 @@ class Report(models.Model):
     user = models.ForeignKey(
         Users, on_delete=models.PROTECT,verbose_name="ユーザー"
     )
+    lot_number = models.CharField(max_length=10, verbose_name='ロッド番号',default='')
     good_product_total = models.IntegerField(null=True,blank=True,verbose_name="優良数")
     bad_product_total = models.IntegerField(null=True,blank=True,verbose_name="不良数")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -64,7 +65,12 @@ class Report(models.Model):
         verbose_name = '日報'
         db_table = "report"
 
+      # ランダムな10文字の英数字を生成
+    def save(self, *args, **kwargs):
+        random_value = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+        self.lot_number = random_value
+        super(Report, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.created_at.strftime('%Y-%m-%d') + ':' + self.user.username + ':' + self.product.name
+        return self.created_at.strftime('%Y-%m-%d') + ':' + self.user.username + ':' + self.product.name + ':' + self.lot_number
 

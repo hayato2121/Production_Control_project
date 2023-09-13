@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 
 from django.views.generic.list import ListView
 from django.views.generic.edit import (
@@ -67,4 +67,7 @@ class ReportListView(LoginRequiredMixin, ListView):
         #ユーザーデータ
         context['user'] = self.request.user
         return context
-        
+    
+ 
+    
+

@@ -2,9 +2,10 @@ from django import forms
 
 from .models import Report
 
-from datetime import datetime
+
 
 class ReportStartForm(forms.ModelForm):
+
     class Meta:
         model = Report
         fields = ('product', 'business')

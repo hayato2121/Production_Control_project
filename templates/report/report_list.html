@@ -2,5 +2,15 @@
 
 {% block content %}
 <h1>所属部署:{{ user.department.name }}</h1>
+
+<!--作業一覧-->
+{% if report.status_change == 'start' %}
+    <p>実行中</p>
+{% elif report.status_change == 'end' %}
+    <p>終了</p>
+{% else %}
+    <p>{{ report.status }}</p>
+{% endif %}
+
 <p><a href="{% url 'daily_report:report_start' %}">作業をスタートする</a></p>
 {% endblock %}
