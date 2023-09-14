@@ -4,12 +4,32 @@
 <h1>所属部署:{{ user.department.name }}</h1>
 
 <!--作業一覧-->
-{% if report.status_change == 'start' %}
-    <p>実行中</p>
-{% elif report.status_change == 'end' %}
-    <p>終了</p>
-{% else %}
-    <p>{{ report.status }}</p>
+{% if reports %}
+<ul>
+    <table >
+        <thead>
+            <tr>
+                <td>製品名</td>
+                <td>製品コード</td>
+                <td>業務内容</td>
+                <td>作業者</td>
+                <td>ロッド番号</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for report in reports %}
+              <tr>
+                <td>{{ report.product.name }}</td>
+                <td>{{ report.product.code }}</td>
+                <td>{{ report.business.name }}</td>
+                <td>{{ report.user.username }}</td>
+                <td>{{ report.lot_number }}</td>
+                <td><button><a href="">終了する</a></button></td>
+              </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</ul>
 {% endif %}
 
 <p><a href="{% url 'daily_report:report_start' %}">作業をスタートする</a></p>

@@ -16,6 +16,7 @@ from .forms import ReportStartForm
 #ログイン状態
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from datetime import date
 # Create your views here.
     
 #作業start
@@ -42,16 +43,19 @@ class ReportEndView(LoginRequiredMixin,TemplateView):
 class ReportListView(LoginRequiredMixin, ListView):
     model = Report
     template_name = os.path.join('report', 'report_list.html')
+    context_object_name = 'reports'
 
 
     #ログインユーザーしか自分のデータを見ることができない設定
     def get_queryset(self):
+        today = date.today()
         user_obj = self.request.user
         if user_obj.is_authenticated:
-             qs = Report.objects.filter(user=user_obj)
+             qs = Report.objects.filter(user=user_obj,created_at__date = today)
         else:
             qs = Report.objects.none()
         return qs
+
     
 
     #ユーザーデータをテンプレートに渡す
@@ -68,6 +72,8 @@ class ReportListView(LoginRequiredMixin, ListView):
         context['user'] = self.request.user
         return context
     
+    #本日の作業一覧を表示
+
  
     
 
