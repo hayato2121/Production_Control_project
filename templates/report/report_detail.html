@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Report Detail</h1>
+    <p>製品名: {{ reportdetail.product.name }}</p>
+    <p>製品コード: {{ reportdetail.product.code }}</p>
+    <p>製品取り数: {{ reportdetail.product.quantity }}</p>
+    <p>ロッドナンバー: {{ reportdetail.lot_number }}</p>
+    <p>成形時メモ: {{ reportdetail.product.memo }}</p>
+    <p>作業者: {{ reportdetail.user.username }}</p>
+    <p>作業日時: {{ reportdetail.created_at.year }}/{{ reportdetail.created_at.month }}/{{ reportdetail.created_at.day }}</p>
+    <p>製品画像: {{ reportdetail.product.pictures }}</p>
+
+
+<p><a href="{% url 'daily_report:report_end' reportdetail.id %}">作業を終了する</a></p>
+{% endblock %}

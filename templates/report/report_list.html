@@ -14,6 +14,9 @@
                 <td>業務内容</td>
                 <td>作業者</td>
                 <td>ロッド番号</td>
+                <td>優良成形数</td>
+                <td>不良成形数</td>
+                
             </tr>
         </thead>
         <tbody>
@@ -24,7 +27,11 @@
                 <td>{{ report.business.name }}</td>
                 <td>{{ report.user.username }}</td>
                 <td>{{ report.lot_number }}</td>
-                <td><button><a href="">終了する</a></button></td>
+                {% if report.good_product is not None %}
+                <td>{{ report.good_product }}</td>
+                <td>{{ report.bad_product }}</td>
+                {% endif %}
+                <td><button><a href="{% url 'daily_report:report_detail' pk=report.id %}">詳細</a></button></td>
               </tr>
             {% endfor %}
         </tbody>

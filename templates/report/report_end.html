@@ -2,9 +2,11 @@
 
 {% block content %}
 <h1>作業終了</h1>
-<form id =method="POST">
+<form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="終了する">
 </form>
 {% endblock %}
+
+</script>

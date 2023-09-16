@@ -12,6 +12,7 @@ class Products(models.Model):
     name = models.CharField(max_length=255,verbose_name="製品名")
     code = models.CharField(max_length=50,verbose_name="製品コード")
     quantity = models.IntegerField(verbose_name="製品取り数")
+    pictures = models.FileField(upload_to='product_pictures',verbose_name='製品画像',null=True)
     memo = models.CharField(max_length=255,blank=True, null=True,verbose_name="製品メモ")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -55,9 +56,10 @@ class Report(models.Model):
     user = models.ForeignKey(
         Users, on_delete=models.PROTECT,verbose_name="ユーザー"
     )
+    memo = models.CharField(max_length=255,blank=True, null=True,verbose_name="引き継ぎ")
     lot_number = models.CharField(max_length=10, verbose_name='ロッド番号',default='')
-    good_product_total = models.IntegerField(null=True,blank=True,verbose_name="優良数")
-    bad_product_total = models.IntegerField(null=True,blank=True,verbose_name="不良数")
+    good_product= models.IntegerField(null=True,blank=True,verbose_name="優良数")
+    bad_product= models.IntegerField(null=True,blank=True,verbose_name="不良数")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

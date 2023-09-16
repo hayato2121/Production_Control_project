@@ -1,9 +1,11 @@
+from typing import Any
 from django.shortcuts import render,redirect
 
 from django.views.generic.list import ListView
 from django.views.generic.edit import (
     UpdateView, DeleteView, CreateView
 )
+from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
 
 from django.urls import reverse_lazy
@@ -11,7 +13,7 @@ from django.urls import reverse_lazy
 from daily_report.models import Report
 import os
 
-from .forms import ReportStartForm
+from .forms import ReportStartForm, ReportEndForm
 
 #ログイン状態
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -32,10 +34,35 @@ class ReportStartView(LoginRequiredMixin, CreateView):
         return super(ReportStartView, self).form_valid(form)
     
         
+#作業詳細
+class ReportDetailView(LoginRequiredMixin,DetailView):
+    model = Report
+    template_name = os.path.join('report', 'report_detail.html')
+    context_object_name = 'reportdetail'
+
+    def get_queryset(self):
+        return Report.objects.all()
 
 #作業終了
-class ReportEndView(LoginRequiredMixin,TemplateView):
+class ReportEndView(LoginRequiredMixin,UpdateView):
+    model = Report
+    form_class = ReportEndForm
     template_name = os.path.join('report', 'report_end.html')
+    success_url = reverse_lazy('daily_report:report_list')
+
+        #計算する
+    def form_valid(self, form):
+        good_product = self.object.product.quantity * form.cleaned_data['sets'] - form.cleaned_data['bad_product']
+        self.object.good_product = good_product 
+        self.object.save()  
+        return super().form_valid(form)
+    
+    #フォームに初期値を渡す
+    def get_initial(self):
+        initial = super().get_initial()
+        return initial
+
+    
 
 
 

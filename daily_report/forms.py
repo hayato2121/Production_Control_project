@@ -25,10 +25,30 @@ class ReportStartForm(forms.ModelForm):
         return report
 
 
-class RepoertEndForm(forms.ModelForm):
-    
+class ReportEndForm(forms.ModelForm):
+    memo = forms.CharField(label='引き継ぎ', widget=forms.TextInput(attrs={'style': 'width: 200px; height: 100px;'}))
+    sets = forms.IntegerField(label='セット数')
+    quantity = forms.IntegerField(label='数量', disabled=True)
+
     class Meta:
-        models = Report
+        model = Report
+        fields = ['product','business','user','lot_number','quantity',
+                  'sets','bad_product','memo']
+
+    #詳細ページからデータを引き出し、初期値に登録する。
+    def __init__(self, *args, **kwargs):
+        super(ReportEndForm, self).__init__(*args, **kwargs)
+        if 'instance' in kwargs and kwargs['instance']:
+            initial_data ={
+                'product': kwargs['instance'].product,
+                'business': kwargs['instance'].business,
+                'user': kwargs['instance'].user,
+                'lot_number': kwargs['instance'].lot_number,
+                'quantity': kwargs['instance'].product.quantity
+            }
+            self.initial.update(initial_data)
+
+
 
     
     
