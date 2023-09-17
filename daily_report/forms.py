@@ -3,6 +3,9 @@ from django import forms
 from .models import Report
 from .models import Business
 
+#ランダム数値
+import random 
+import string
 
 
 class ReportStartForm(forms.ModelForm):
@@ -25,6 +28,11 @@ class ReportStartForm(forms.ModelForm):
         report = super(ReportStartForm, self).save(commit=False)
         if self.user:
             report.user = self.user
+
+        #lot_numberにランダムの整数値を生成する
+        random_value = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+        report.lot_number = random_value
+
         if commit:
             report.save()
         return report
@@ -41,12 +49,12 @@ class ReportEndForm(forms.ModelForm):
         fields = ['product','business','user','lot_number','quantity',
                   'sets','bad_product','memo']
 
-    #初期値。
+    #初期値設定
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super(ReportEndForm, self).__init__(*args, **kwargs)
 
-        
+
         # ユーザーの部署と紐づく業務内容のみを選択肢として表示
         if self.user and self.user.department:
             self.fields['business'].queryset = Business.objects.filter(department=self.user.department)

@@ -11,6 +11,7 @@ from django.views.generic.base import TemplateView
 from django.urls import reverse_lazy
 
 from daily_report.models import Report
+from product_management.models import Molding
 import os
 
 from .forms import ReportStartForm, ReportEndForm
@@ -20,7 +21,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 
 from datetime import date
 
-from django.http import JsonResponse
 # Create your views here.
     
 #作業start
@@ -56,13 +56,34 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
     template_name = os.path.join('report', 'report_end.html')
     success_url = reverse_lazy('daily_report:report_list')
 
+
     def form_valid(self, form):
         if form.is_valid():
             #good_productの計算
             good_product = self.object.product.quantity * form.cleaned_data['sets'] - form.cleaned_data['bad_product']
             self.object.good_product = good_product 
             self.object.save()  
+
+            #編集したReportデータを取得しMoldingモデルに同時にCreateする
+            molding_data = {
+            'product' : self.object.product,
+            'user': self.object.user,
+            'lot_number': self.object.lot_number,
+            'good_molding': self.object.good_product,
+            'bad_molding': self.object.bad_product,
+            'memo' : self.object.memo,
+            }
+
+            #同じlot_numberがある場合は、データを更新する
+            molding, created = Molding.objects.get_or_create(lot_number=self.object.lot_number,defaults=molding_data)
+            if not created:
+                #lot_numberがかぶっていれば更新
+                for key, value in molding_data.items():
+                    setattr(molding, key, value)
+                molding.save()
             return super().form_valid(form)
+        
+
         else:
             errors = form.errors
             for field, messages in errors.items():

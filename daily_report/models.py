@@ -3,9 +3,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from accounts.models import Users, Departments
-#ランダム数値
-import random 
-import string
+
 
 #製品情報
 class Products(models.Model):
@@ -67,11 +65,6 @@ class Report(models.Model):
         verbose_name = '日報'
         db_table = "report"
 
-    def save(self, *args, **kwargs):
-        # ランダムな10文字の英数字を生成
-        random_value = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
-        self.lot_number = random_value
-        super(Report, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.created_at.strftime('%Y-%m-%d') + ':' + self.user.username + ':' + self.product.name + ':' + self.lot_number

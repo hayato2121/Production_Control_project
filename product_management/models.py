@@ -11,9 +11,9 @@ class Molding(models.Model):
     product = models.ForeignKey(
         Products, on_delete=models.PROTECT, verbose_name='製品名'
     )
-    lot_number = models.IntegerField(verbose_name="ロッドナンバー")
+    lot_number = models.CharField(max_length=10, verbose_name='ロッド番号',default='')
     good_molding = models.IntegerField(verbose_name="優良成形数")
-    bat_molding = models.IntegerField(verbose_name="不良成形数")
+    bad_molding = models.IntegerField(verbose_name="不良成形数")
     memo = models.CharField(max_length=255,verbose_name="成形メモ",null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -23,7 +23,7 @@ class Molding(models.Model):
         db_table = 'molding'
 
     def __str__(self):
-        return self.product + ':' + self.user + ':' + self.lot_number
+        return self.product.name + ':' + self.lot_number + ':' + self.user.username 
 
     
 #納品先---------------------------------------------------------------
