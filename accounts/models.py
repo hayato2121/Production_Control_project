@@ -71,4 +71,3 @@ class Users(AbstractBaseUser, PermissionsMixin):
 
     def get_absolute_url(self):
         return reverse_lazy('accounts:home')
-

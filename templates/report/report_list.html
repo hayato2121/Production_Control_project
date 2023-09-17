@@ -31,7 +31,14 @@
                 <td>{{ report.good_product }}</td>
                 <td>{{ report.bad_product }}</td>
                 {% endif %}
-                <td><button><a href="{% url 'daily_report:report_detail' pk=report.id %}">詳細</a></button></td>
+                {% if report.good_product %}
+                <td><button><a href="{% url 'daily_report:report_detail' pk=report.id %}">終了</a></button></td></td>
+                {% else %}
+                <td><button><a href="{% url 'daily_report:report_detail' pk=report.id %}">実行中</a></button></td>
+                {% endif %}
+                <!--あとでcssを使ってモーダルウィンドウにする-->
+                <td><button><a href="{% url 'daily_report:report_delete' pk=report.id %}">削除</a></button></td>
+                
               </tr>
             {% endfor %}
         </tbody>
@@ -40,4 +47,33 @@
 {% endif %}
 
 <p><a href="{% url 'daily_report:report_start' %}">作業をスタートする</a></p>
+
+<script>
+    /*
+    var csrftoken = getCookie('csrftoken'); 
+    function confirmDelete(reportId){
+        if(confirm("この作業を削除していいですか")){
+            $.ajax({
+                url:"/report_delete/" + reportId + "/",
+                method: "DELETE",
+                headers: { "X-CSRFToken": csrftoken },
+                success: function(response) {
+                    if (response.success) {
+                        alert("レポートが削除されました");
+                        location.href = "{% url 'daily_report:report_list' %}";
+                    } else {
+                        alert('レポートの削除を中止しました');
+                    }
+                },
+                error: function() {
+                    alert("リクエストエラーが発生しました");
+                }
+            });
+        }
+    }
+    */
+
+    
+</script>
+
 {% endblock %}

@@ -10,7 +10,14 @@
     <p>作業者: {{ reportdetail.user.username }}</p>
     <p>作業日時: {{ reportdetail.created_at.year }}/{{ reportdetail.created_at.month }}/{{ reportdetail.created_at.day }}</p>
     <p>製品画像: {{ reportdetail.product.pictures }}</p>
+    {% if reportdetail.good_product %}
+    <p>優良成形数：{{ reportdetail.good_product }}</p>
+    <p>不良成形数: {{ reportdetail.bad_product }}</p>
+    <p><a href="{% url 'daily_report:report_end' reportdetail.id %}">結果を編集する</a></p>
+    {% else %}
+    <p><a href="{% url 'daily_report:report_end' reportdetail.id %}">作業を終了する</a></p>
+    {% endif %}
 
+    <button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>
 
-<p><a href="{% url 'daily_report:report_end' reportdetail.id %}">作業を終了する</a></p>
 {% endblock %}

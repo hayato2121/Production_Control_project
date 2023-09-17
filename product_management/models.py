@@ -32,6 +32,7 @@ class Delivery(models.Model):
     delivery_code = models.IntegerField(verbose_name='納品先コード')
 
     class Meta:
+        verbose_name = '納品先'
         db_table = 'delivery'
 
     def __str__(self):

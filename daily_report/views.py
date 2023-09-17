@@ -19,6 +19,8 @@ from .forms import ReportStartForm, ReportEndForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from datetime import date
+
+from django.http import JsonResponse
 # Create your views here.
     
 #作業start
@@ -28,11 +30,15 @@ class ReportStartView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy('daily_report:report_list')
 
     def form_valid(self, form):
-        if form.is_valid(): #バリデーションする
-            form.instance.user = self.request.user #ユーザー情報を設定
-            form.save() #保存する。
+        # ログインしているユーザー情報をフォームにセット
+        form.instance.user = self.request.user
         return super(ReportStartView, self).form_valid(form)
-    
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user  # フォームにユーザー情報を渡す
+        return kwargs
+
         
 #作業詳細
 class ReportDetailView(LoginRequiredMixin,DetailView):
@@ -50,21 +56,35 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
     template_name = os.path.join('report', 'report_end.html')
     success_url = reverse_lazy('daily_report:report_list')
 
-        #計算する
     def form_valid(self, form):
-        good_product = self.object.product.quantity * form.cleaned_data['sets'] - form.cleaned_data['bad_product']
-        self.object.good_product = good_product 
-        self.object.save()  
-        return super().form_valid(form)
+        if form.is_valid():
+            #good_productの計算
+            good_product = self.object.product.quantity * form.cleaned_data['sets'] - form.cleaned_data['bad_product']
+            self.object.good_product = good_product 
+            self.object.save()  
+            return super().form_valid(form)
+        else:
+            errors = form.errors
+            for field, messages in errors.items():
+                for message in messages:
+                    # エラーメッセージをログに記録する例
+                    print(f"Validation error for field '{field}': {message}")
+
+        return self.render_to_response(self.get_context_data(form=form))
     
     #フォームに初期値を渡す
     def get_initial(self):
         initial = super().get_initial()
+
         return initial
+    
+    #フォームにユーザー情報をわたし、部署ごとの業務内容を選択できるようにする。
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user 
+        return kwargs
 
     
-
-
 
 #作業一覧
 class ReportListView(LoginRequiredMixin, ListView):
@@ -99,7 +119,15 @@ class ReportListView(LoginRequiredMixin, ListView):
         context['user'] = self.request.user
         return context
     
-    #本日の作業一覧を表示
+
+class ReportDeleteView(LoginRequiredMixin,DeleteView):
+    model = Report
+    success_url = reverse_lazy('daily_report:report_list')
+    template_name = os.path.join('report', 'report_delete.html')
+   
+
+    
+
 
  
     

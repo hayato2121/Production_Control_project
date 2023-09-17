@@ -56,7 +56,7 @@ class Report(models.Model):
     user = models.ForeignKey(
         Users, on_delete=models.PROTECT,verbose_name="ユーザー"
     )
-    memo = models.CharField(max_length=255,blank=True, null=True,verbose_name="引き継ぎ")
+    memo = models.CharField(max_length=255,blank=True, null=True,verbose_name="引き継ぎ",)
     lot_number = models.CharField(max_length=10, verbose_name='ロッド番号',default='')
     good_product= models.IntegerField(null=True,blank=True,verbose_name="優良数")
     bad_product= models.IntegerField(null=True,blank=True,verbose_name="不良数")
@@ -67,8 +67,8 @@ class Report(models.Model):
         verbose_name = '日報'
         db_table = "report"
 
-      # ランダムな10文字の英数字を生成
     def save(self, *args, **kwargs):
+        # ランダムな10文字の英数字を生成
         random_value = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
         self.lot_number = random_value
         super(Report, self).save(*args, **kwargs)
@@ -76,3 +76,4 @@ class Report(models.Model):
     def __str__(self):
         return self.created_at.strftime('%Y-%m-%d') + ':' + self.user.username + ':' + self.product.name + ':' + self.lot_number
 
+    
