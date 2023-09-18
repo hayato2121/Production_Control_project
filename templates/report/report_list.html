@@ -14,9 +14,9 @@
                 <td>業務内容</td>
                 <td>作業者</td>
                 <td>ロッド番号</td>
+                <td>作業状況</td>
                 <td>優良成形数</td>
                 <td>不良成形数</td>
-                
             </tr>
         </thead>
         <tbody>
@@ -27,15 +27,14 @@
                 <td>{{ report.business.name }}</td>
                 <td>{{ report.user.username }}</td>
                 <td>{{ report.lot_number }}</td>
+                <td>{{ report.status }}</td>
+
                 {% if report.good_product is not None %}
                 <td>{{ report.good_product }}</td>
                 <td>{{ report.bad_product }}</td>
                 {% endif %}
-                {% if report.good_product %}
-                <td><button><a href="{% url 'daily_report:report_detail' pk=report.id %}">終了</a></button></td></td>
-                {% else %}
-                <td><button><a href="{% url 'daily_report:report_detail' pk=report.id %}">実行中</a></button></td>
-                {% endif %}
+
+                <td><button><a href="{% url 'daily_report:report_detail' pk=report.id %}">詳細画面</a></button></td>
                 <!--あとでcssを使ってモーダルウィンドウにする-->
                 <td><button><a href="{% url 'daily_report:report_delete' pk=report.id %}">削除</a></button></td>
                 

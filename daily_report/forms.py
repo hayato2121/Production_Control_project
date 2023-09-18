@@ -39,6 +39,9 @@ class ReportStartForm(forms.ModelForm):
 
 
 class ReportEndForm(forms.ModelForm):
+    product = forms.CharField(label='製品名')
+    business = forms.CharField(label='業務内容')
+    
     memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.TextInput(attrs={'style': 'width: 200px; height: 100px;'}))
     sets = forms.IntegerField(label='セット数')
     bad_product = forms.IntegerField(label='不良数')
@@ -46,7 +49,7 @@ class ReportEndForm(forms.ModelForm):
     
     class Meta:
         model = Report
-        fields = ['product','business','user','lot_number','quantity',
+        fields = ['user','lot_number','quantity',
                   'sets','bad_product','memo']
 
     #初期値設定
@@ -61,6 +64,7 @@ class ReportEndForm(forms.ModelForm):
         
         #詳細データからデータを引き出し初期値に登録
         if 'instance' in kwargs and kwargs['instance']:
+            
             initial_data ={
                 'product': kwargs['instance'].product,
                 'business': kwargs['instance'].business,

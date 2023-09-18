@@ -35,12 +35,14 @@ class ReportStartView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         # ログインしているユーザー情報をフォームにセット
         form.instance.user = self.request.user
+        form.instance.status = '実行中'
         return super(ReportStartView, self).form_valid(form)
-
+        
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user  # フォームにユーザー情報を渡す
-        return kwargs
+        return kwargs  
+
 
         
 #作業詳細
@@ -69,6 +71,9 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
             else:
                 self.object.good_product = None
             self.object.save()
+
+            #status変更
+            form.instance.status = '終了'
 
             response = super().form_valid(form)
 
@@ -114,7 +119,7 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user 
         return kwargs
-
+    
     
 
 #作業一覧
@@ -150,6 +155,8 @@ class ReportListView(LoginRequiredMixin, ListView):
         context['user'] = self.request.user
         return context
     
+
+
 #作業削除
 class ReportDeleteView(LoginRequiredMixin,DeleteView):
     model = Report

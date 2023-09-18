@@ -58,6 +58,7 @@ class Report(models.Model):
     lot_number = models.CharField(max_length=10, verbose_name='ロッド番号',default='')
     good_product= models.IntegerField(null=True,blank=True,verbose_name="優良数")
     bad_product= models.IntegerField(null=True,blank=True,verbose_name="不良数")
+    status = models.CharField(max_length=10, null=True, blank=True, verbose_name="作業状況",)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
