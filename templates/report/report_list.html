@@ -45,6 +45,13 @@
 </ul>
 {% endif %}
 
+{% if request.user.department.name == '製造部' %}
 <p><a href="{% url 'daily_report:report_start' %}">作業をスタートする</a></p>
+{% elif request.user.department.name == '検査部' %}
+<p><a href="{% url 'daily_report:report_start_inspection' %}">作業をスタートする_検査</a></p>
+{% else %}
+<p><a href="{% url 'daily_report:report_start' %}">作業をスタートする</a></p>
+{% endif %}
+
 
 {% endblock %}

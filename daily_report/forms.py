@@ -2,12 +2,13 @@ from django import forms
 
 from .models import Report
 from .models import Business
+from product_management.models import Molding
 
 #ランダム数値
 import random 
 import string
 
-
+#--------------------------------------------------------------------------------------------------
 class ReportStartForm(forms.ModelForm):
 
     class Meta:
@@ -37,7 +38,7 @@ class ReportStartForm(forms.ModelForm):
             report.save()
         return report
 
-
+#--------------------------------------------------------------------------------------------------
 class ReportEndForm(forms.ModelForm):
     product = forms.CharField(label='製品名')
     business = forms.CharField(label='業務内容')
@@ -89,7 +90,35 @@ class ReportEndForm(forms.ModelForm):
             self.fields['quantity'].widget = forms.HiddenInput()
 
 
+#--------------------------------------------------------------------------------------------------
+class ReportStartInspectionForm(forms.ModelForm):
+    molding_lot_number = forms.ChoiceField(label='成形品ロッドナンバー', choices=[])
 
-    
-    
+    class Meta:
+        model = Report
+        fields = ['molding_lot_number','business']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super(ReportStartInspectionForm, self).__init__(*args, **kwargs)
+
+        # Molding モデルから異なる lot_number の値を取得して選択肢としてセットします
+        molding_lot_numbers = Molding.objects.values_list('lot_number', flat=True).distinct()
+        molding_choices = [(lot_number, lot_number) for lot_number in molding_lot_numbers]
+
+
+        self.fields['molding_lot_number'].choices = molding_choices
+
+        if user and user.department:
+            self.fields['business'].queryset = Business.objects.filter(department=user.department)
+
+
+    #userフィールドに自動でリクエストユーザーをする。
+    def save(self, commit=True):
+        report = super(ReportStartInspectionForm, self).save(commit=False)
+        if self.user:
+            report.user = self.user
+        if commit:
+            report.save()
+        return report
         

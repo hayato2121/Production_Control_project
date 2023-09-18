@@ -14,7 +14,7 @@ from daily_report.models import Report
 from product_management.models import Molding
 import os
 
-from .forms import ReportStartForm, ReportEndForm
+from .forms import ReportStartForm, ReportEndForm, ReportStartInspectionForm
 
 #ログイン状態
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -26,7 +26,7 @@ from django.dispatch import receiver
 
 # Create your views here.
     
-#作業start
+#作業start----------------------------------------------------------------------------------------------------------------------------------------------------------
 class ReportStartView(LoginRequiredMixin, CreateView):
     template_name = os.path.join('report', 'report_start.html')
     form_class = ReportStartForm
@@ -45,7 +45,7 @@ class ReportStartView(LoginRequiredMixin, CreateView):
 
 
         
-#作業詳細
+#作業詳細----------------------------------------------------------------------------------------------------------------------------------------------------------
 class ReportDetailView(LoginRequiredMixin,DetailView):
     model = Report
     template_name = os.path.join('report', 'report_detail.html')
@@ -54,7 +54,7 @@ class ReportDetailView(LoginRequiredMixin,DetailView):
     def get_queryset(self):
         return Report.objects.all()
 
-#作業終了
+#作業終了----------------------------------------------------------------------------------------------------------------------------------------------------------
 class ReportEndView(LoginRequiredMixin,UpdateView):
     model = Report
     form_class = ReportEndForm
@@ -122,7 +122,7 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
     
     
 
-#作業一覧
+#作業一覧----------------------------------------------------------------------------------------------------------------------------------------------------------
 class ReportListView(LoginRequiredMixin, ListView):
     model = Report
     template_name = os.path.join('report', 'report_list.html')
@@ -157,7 +157,7 @@ class ReportListView(LoginRequiredMixin, ListView):
     
 
 
-#作業削除
+#作業削除----------------------------------------------------------------------------------------------------------------------------------------------------------
 class ReportDeleteView(LoginRequiredMixin,DeleteView):
     model = Report
     success_url = reverse_lazy('daily_report:report_list')
@@ -166,7 +166,22 @@ class ReportDeleteView(LoginRequiredMixin,DeleteView):
 
    
 
+#作業start(検査業務)----------------------------------------------------------------------------------------------------------------------------------------------------------
+class RepoetStartInspectionView(LoginRequiredMixin,CreateView):
+    template_name = os.path.join('report', 'report_start_inspection.html')
+    form_class = ReportStartInspectionForm
+    success_url = reverse_lazy('daily_report:report_list')
 
+    def form_valid(self, form):
+        # ログインしているユーザー情報をフォームにセット
+        form.instance.user = self.request.user
+        form.instance.status = '実行中'
+        return super(ReportStartView, self).form_valid(form)
+        
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user  # フォームにユーザー情報を渡す
+        return kwargs  
 
 
  
