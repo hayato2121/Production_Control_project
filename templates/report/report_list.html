@@ -48,32 +48,4 @@
 
 <p><a href="{% url 'daily_report:report_start' %}">作業をスタートする</a></p>
 
-<script>
-    /*
-    var csrftoken = getCookie('csrftoken'); 
-    function confirmDelete(reportId){
-        if(confirm("この作業を削除していいですか")){
-            $.ajax({
-                url:"/report_delete/" + reportId + "/",
-                method: "DELETE",
-                headers: { "X-CSRFToken": csrftoken },
-                success: function(response) {
-                    if (response.success) {
-                        alert("レポートが削除されました");
-                        location.href = "{% url 'daily_report:report_list' %}";
-                    } else {
-                        alert('レポートの削除を中止しました');
-                    }
-                },
-                error: function() {
-                    alert("リクエストエラーが発生しました");
-                }
-            });
-        }
-    }
-    */
-
-    
-</script>
-
 {% endblock %}

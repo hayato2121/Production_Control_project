@@ -75,6 +75,15 @@ class ReportEndForm(forms.ModelForm):
         for field_name in [ 'product', 'business', 'user','lot_number']:
             self.fields[field_name].widget.attrs['readonly'] = 'readonly'
 
+        #業務内容が成形以外なら成形数は入力しない
+        if  self.instance and self.instance.business.name != '成形':
+            self.fields['sets'].required = False
+            self.fields['bad_product'].required = False
+            self.fields['quantity'].required = False
+            self.fields['sets'].widget = forms.HiddenInput()
+            self.fields['bad_product'].widget = forms.HiddenInput()
+            self.fields['quantity'].widget = forms.HiddenInput()
+
 
 
     

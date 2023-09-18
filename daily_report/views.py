@@ -1,5 +1,5 @@
 from typing import Any
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect, get_object_or_404
 
 from django.views.generic.list import ListView
 from django.views.generic.edit import (
@@ -20,6 +20,9 @@ from .forms import ReportStartForm, ReportEndForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from datetime import date
+
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 # Create your views here.
     
@@ -60,30 +63,37 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
     def form_valid(self, form):
         if form.is_valid():
             #good_productの計算
-            good_product = self.object.product.quantity * form.cleaned_data['sets'] - form.cleaned_data['bad_product']
-            self.object.good_product = good_product 
-            self.object.save()  
+            if self.object.business.name == '成形':
+                good_product = self.object.product.quantity * form.cleaned_data['sets'] - form.cleaned_data['bad_product']
+                self.object.good_product = good_product   
+            else:
+                self.object.good_product = None
+            self.object.save()
 
-            #編集したReportデータを取得しMoldingモデルに同時にCreateする
-            molding_data = {
-            'product' : self.object.product,
-            'user': self.object.user,
-            'lot_number': self.object.lot_number,
-            'good_molding': self.object.good_product,
-            'bad_molding': self.object.bad_product,
-            'memo' : self.object.memo,
-            }
+            response = super().form_valid(form)
 
-            #同じlot_numberがある場合は、データを更新する
-            molding, created = Molding.objects.get_or_create(lot_number=self.object.lot_number,defaults=molding_data)
-            if not created:
-                #lot_numberがかぶっていれば更新
-                for key, value in molding_data.items():
-                    setattr(molding, key, value)
-                molding.save()
-            return super().form_valid(form)
-        
+            #業務内容が成形の時のみ成形モデルに送る
+            if self.object.business.name == '成形':
+                #編集したReportデータを取得しMoldingモデルに同時にCreateする
+                molding_data = {
+                'product' : self.object.product,
+                'user': self.object.user,
+                'lot_number': self.object.lot_number,
+                'good_molding': self.object.good_product,
+                'bad_molding': self.object.bad_product,
+                'memo' : self.object.memo,
+                }
 
+                #同じlot_numberがある場合は、データを更新する
+                molding, created = Molding.objects.get_or_create(lot_number=self.object.lot_number,defaults=molding_data)
+                if not created:
+                    #lot_numberがかぶっていれば更新
+                    for key, value in molding_data.items():
+                        setattr(molding, key, value)
+                    molding.save()
+
+            return response
+            
         else:
             errors = form.errors
             for field, messages in errors.items():
@@ -140,14 +150,16 @@ class ReportListView(LoginRequiredMixin, ListView):
         context['user'] = self.request.user
         return context
     
-
+#作業削除
 class ReportDeleteView(LoginRequiredMixin,DeleteView):
     model = Report
     success_url = reverse_lazy('daily_report:report_list')
     template_name = os.path.join('report', 'report_delete.html')
+
+
    
 
-    
+
 
 
  

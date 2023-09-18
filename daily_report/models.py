@@ -44,15 +44,15 @@ class Business(models.Model):
 class Report(models.Model):
     #製品情報紐付け
     product = models.ForeignKey(
-        Products, on_delete=models.PROTECT,verbose_name="製品情報"
+        Products, on_delete=models.CASCADE,verbose_name="製品情報"
     )
     #業務内容紐付け
     business = models.ForeignKey(
-        Business, on_delete=models.PROTECT,verbose_name="業務内容"
+        Business, on_delete=models.CASCADE,verbose_name="業務内容"
     )
     #ユーザー情報紐付け
     user = models.ForeignKey(
-        Users, on_delete=models.PROTECT,verbose_name="ユーザー"
+        Users, on_delete=models.CASCADE,verbose_name="ユーザー"
     )
     memo = models.CharField(max_length=255,blank=True, null=True,verbose_name="引き継ぎ",)
     lot_number = models.CharField(max_length=10, verbose_name='ロッド番号',default='')
@@ -67,6 +67,6 @@ class Report(models.Model):
 
 
     def __str__(self):
-        return self.created_at.strftime('%Y-%m-%d') + ':' + self.user.username + ':' + self.product.name + ':' + self.lot_number
+        return self.created_at.strftime('%Y-%m-%d') + ':' + self.user.username + ':' + self.product.name + ':' + self.lot_number + ':' + self.business.name
 
     

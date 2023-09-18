@@ -6,10 +6,10 @@ from daily_report.models import Products
 #成形品作成---------------------------------------------------------------
 class Molding(models.Model):
     user = models.ForeignKey(
-        Users, on_delete=models.PROTECT, verbose_name='ユーザー名'
+        Users, on_delete=models.CASCADE, verbose_name='ユーザー名'
     )
     product = models.ForeignKey(
-        Products, on_delete=models.PROTECT, verbose_name='製品名'
+        Products, on_delete=models.CASCADE, verbose_name='製品名'
     )
     lot_number = models.CharField(max_length=10, verbose_name='ロッド番号',default='')
     good_molding = models.IntegerField(verbose_name="優良成形数")
