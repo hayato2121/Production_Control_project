@@ -11,7 +11,7 @@ class Molding(models.Model):
     lot_number = models.CharField(max_length=10, verbose_name='ロッド番号',default='')
     good_molding = models.IntegerField(verbose_name="優良成形数")
     bad_molding = models.IntegerField(verbose_name="不良成形数")
-    molding_user = models.ForeignKey(
+    user = models.ForeignKey(
         Users, on_delete=models.CASCADE, verbose_name='成形担当ユーザー名',null=True
     )
     memo = models.CharField(max_length=255,verbose_name="引き継ぎメモ",null=True,blank=True)

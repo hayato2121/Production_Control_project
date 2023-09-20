@@ -82,7 +82,7 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
                 #編集したReportデータを取得しMoldingモデルに同時にCreateする
                 molding_data = {
                 'product' : self.object.product,
-                'molding_user': self.object.user,
+                'user': self.object.user,
                 'lot_number': self.object.lot_number,
                 'good_molding': self.object.good_product,
                 'bad_molding': self.object.bad_product,
