@@ -3,6 +3,7 @@ from django import forms
 from .models import Report
 from .models import Business
 from product_management.models import Molding
+from accounts.models import Users
 
 #ランダム数値
 import random 
@@ -62,6 +63,8 @@ class ReportEndForm(forms.ModelForm):
         # ユーザーの部署と紐づく業務内容のみを選択肢として表示
         if self.user and self.user.department:
             self.fields['business'].queryset = Business.objects.filter(department=self.user.department)
+            self.fields['user'].queryset = Users.objects.filter(department=self.user.department)
+
         
         #詳細データからデータを引き出し初期値に登録
         if 'instance' in kwargs and kwargs['instance']:

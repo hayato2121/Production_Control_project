@@ -23,8 +23,8 @@ class Molding(models.Model):
         db_table = 'molding'
 
     def __str__(self):
-        if self.molding_user:
-          return self.product.name + ':' + self.lot_number + ':' + self.molding_user.username
+        if self.user:
+          return self.product.name + ':' + self.lot_number + ':' + self.user.username
         else:
           return self.product.name + ':' + self.lot_number + ':No User'
 #納品先---------------------------------------------------------------
