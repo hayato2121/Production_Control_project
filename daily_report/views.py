@@ -82,7 +82,7 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
                 #編集したReportデータを取得しMoldingモデルに同時にCreateする
                 molding_data = {
                 'product' : self.object.product,
-                'user': self.object.user,
+                'molding_user': self.object.user,
                 'lot_number': self.object.lot_number,
                 'good_molding': self.object.good_product,
                 'bad_molding': self.object.bad_product,
@@ -176,7 +176,20 @@ class RepoetStartInspectionView(LoginRequiredMixin,CreateView):
         # ログインしているユーザー情報をフォームにセット
         form.instance.user = self.request.user
         form.instance.status = '実行中'
-        return super(ReportStartView, self).form_valid(form)
+
+        molding_lot_number = form.cleaned_data['molding_lot_number']
+        molding = Molding.objects.filter(lot_number=molding_lot_number).first()
+
+        if molding:
+            report = form.save(commit=False)
+            report.product = molding.product
+            report.lot_number = molding.lot_number
+
+            if form.cleaned_data['business']:
+                report.business = form.cleaned_data['business']
+            report.save()
+            
+        return super(RepoetStartInspectionView, self).form_valid(form)
         
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()

@@ -99,18 +99,17 @@ class ReportStartInspectionForm(forms.ModelForm):
         fields = ['molding_lot_number','business']
 
     def __init__(self, *args, **kwargs):
-        user = kwargs.pop('user', None)
+        self.user = kwargs.pop('user', None)
         super(ReportStartInspectionForm, self).__init__(*args, **kwargs)
 
-        # Molding モデルから異なる lot_number の値を取得して選択肢としてセットします
+        # Molding モデルから lot_number の値を取得して選択肢としてセットします
         molding_lot_numbers = Molding.objects.values_list('lot_number', flat=True).distinct()
         molding_choices = [(lot_number, lot_number) for lot_number in molding_lot_numbers]
-
-
         self.fields['molding_lot_number'].choices = molding_choices
 
-        if user and user.department:
-            self.fields['business'].queryset = Business.objects.filter(department=user.department)
+        #ユーザーの部署に合わせて業務内容を表示
+        if self.user and self.user.department:
+            self.fields['business'].queryset = Business.objects.filter(department=self.user.department)
 
 
     #userフィールドに自動でリクエストユーザーをする。
