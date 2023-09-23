@@ -7,11 +7,12 @@ from product_management.models import Molding
 # Reportモデルが削除されたら自動的にMoldingオブジェクトを削除するシグナルハンドラ
 @receiver(post_delete, sender=Report)
 def delete_molding(sender, instance, **kwargs):
-    # instanceは削除されたReportオブジェクト
-    lot_number = instance.lot_number
+    # instanceは削除されたReportオブジェクト.reportの業務内容が成形の時だけ
+    if instance.business.name == '成形':
+        lot_number = instance.lot_number
 
-    # Report.lot_numberと一致するMoldingオブジェクトを取得
-    moldings = Molding.objects.filter(lot_number=lot_number)
+        # Report.lot_numberと一致するMoldingオブジェクトを取得
+        moldings = Molding.objects.filter(lot_number=lot_number)
 
-    # すべてのMoldingオブジェクトを削除
-    moldings.delete()
+        # すべてのMoldingオブジェクトを削除
+        moldings.delete()

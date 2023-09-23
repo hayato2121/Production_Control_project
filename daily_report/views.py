@@ -11,7 +11,7 @@ from django.views.generic.base import TemplateView
 from django.urls import reverse_lazy
 
 from daily_report.models import Report
-from product_management.models import Molding
+from product_management.models import Molding, Stock
 import os
 
 from .forms import ReportStartForm, ReportEndForm, ReportStartInspectionForm
@@ -79,10 +79,21 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
 
     def form_valid(self, form):
         if form.is_valid():
-            #現在のlot_numberを取得して、同じlot_numberからmoldingデータを取り出し、good_moldingデータを取り出す。
+
+            #現在のlot_numberを取得して、同じlot_numberからmoldingデータを取りだす。
             lot_number = self.object.lot_number
             molding_queryset = Molding.objects.filter(lot_number=lot_number)
-            good_molding = molding_queryset.values_list('good_molding', flat=True).first()
+            if molding_queryset.exists():
+                first_molding = molding_queryset.first()
+
+                good_molding = first_molding.good_molding
+                molding_user = first_molding.user 
+                molding_created_at = first_molding.created_at 
+            else:
+                good_molding = None
+                molding_user = None
+                molding_created_at = None
+                        
             
             #good_productの計算
             if self.object.business.name == '成形' :
@@ -104,12 +115,12 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
             if self.object.business.name == '成形':
                 #編集したReportデータを取得しMoldingモデルに同時にCreateする
                 molding_data = {
-                'product' : self.object.product,
-                'user': self.object.user,
-                'lot_number': self.object.lot_number,
-                'good_molding': self.object.good_product,
-                'bad_molding': self.object.bad_product,
-                'memo' : self.object.memo,
+                    'product' : self.object.product,
+                    'user': self.object.user,
+                    'lot_number': self.object.lot_number,
+                    'good_molding': self.object.good_product,
+                    'bad_molding': self.object.bad_product,
+                    'memo' : self.object.memo,
                 }
 
                 #同じlot_numberがある場合は、データを更新する
@@ -119,6 +130,24 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
                     for key, value in molding_data.items():
                         setattr(molding, key, value)
                     molding.save()
+
+            if self.object.business.name == '検査':
+                stock_date = {
+                    'product': self.object.product,
+                    'lot_number': self.object.lot_number,
+                    'stocks': self.object.good_product,
+                    'molding_user':molding_user,
+                    'molding_time':molding_created_at,
+                    'inspection_user': self.object.user,
+                    'memo': self.object.memo,
+                }
+            
+                stock, created = Stock.objects.get_or_create(lot_number=self.object.lot_number,defaults=stock_date)
+                if not created:
+                    #lot_numberがかぶっていれば更新
+                    for key, value in stock_date.items():
+                        setattr(stock, key, value)
+                    stock.save()
 
             return response
             

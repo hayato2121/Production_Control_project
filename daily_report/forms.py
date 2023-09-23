@@ -31,9 +31,12 @@ class ReportStartForm(forms.ModelForm):
         if self.user:
             report.user = self.user
 
-        #lot_numberにランダムの整数値を生成する
-        random_value = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
-        report.lot_number = random_value
+        #lot_numberにランダムの整数値を生成する.その時にreportモデルにあるlot_numberと被らないようにする
+        while True:
+            random_value = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+            if not Report.objects.filter(lot_number=random_value).exists():
+                report.lot_number = random_value
+                break
 
         if commit:
             report.save()
