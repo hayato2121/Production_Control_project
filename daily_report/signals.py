@@ -1,4 +1,4 @@
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 from .models import Report
 from product_management.models import Molding,Stock
@@ -30,3 +30,17 @@ def delete_stock(sender, instance, **kwargs):
         # すべてのMoldingオブジェクトを削除
         stocks.delete()
 
+@receiver(post_save, sender=Stock)
+def update_molding(sender, instance, created, **kwargs):
+    # Stock オブジェクトが作成された場合のみ処理を実行
+    if created:
+        lot_number = instance.lot_number
+
+        # lot_number に一致する Molding オブジェクトを取得
+        molding = Molding.objects.filter(lot_number=lot_number).first()
+
+        if molding:
+            # Molding オブジェクトを変更する必要がある場合の処理をここに記述
+            # 例えば、以下のように Molding オブジェクトを更新する
+            
+            molding.delete()

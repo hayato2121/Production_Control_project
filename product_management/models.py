@@ -4,7 +4,7 @@ from daily_report.models import Products
 from datetime import datetime
 # Create your models here.
 
-#成形品作成---------------------------------------------------------------
+#成形品---------------------------------------------------------------
 class Molding(models.Model):
     product = models.ForeignKey(
         Products, on_delete=models.CASCADE, verbose_name='製品名'
