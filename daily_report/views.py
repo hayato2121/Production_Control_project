@@ -53,6 +53,21 @@ class ReportDetailView(LoginRequiredMixin,DetailView):
 
     def get_queryset(self):
         return Report.objects.all()
+    
+    #moldingのデータから優良数と不良数を持ってくる.確認のために表示するためなので、formは入れない
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        if self.request.user.department.name == '検査部':
+            report_lot_number = self.object.lot_number
+            molding = Molding.objects.filter(lot_number = report_lot_number).first()
+
+            context['inspection_good_molding'] = molding.good_molding
+            context['inspection_bad_molding'] = molding.bad_molding
+            context['inspection_molding_user'] = molding.user.username
+
+        return context
+            
 
 #作業終了----------------------------------------------------------------------------------------------------------------------------------------------------------
 class ReportEndView(LoginRequiredMixin,UpdateView):
@@ -64,10 +79,18 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
 
     def form_valid(self, form):
         if form.is_valid():
+            #現在のlot_numberを取得して、同じlot_numberからmoldingデータを取り出し、good_moldingデータを取り出す。
+            lot_number = self.object.lot_number
+            molding_queryset = Molding.objects.filter(lot_number=lot_number)
+            good_molding = molding_queryset.values_list('good_molding', flat=True).first()
+            
             #good_productの計算
-            if self.object.business.name == '成形':
+            if self.object.business.name == '成形' :
                 good_product = self.object.product.quantity * form.cleaned_data['sets'] - form.cleaned_data['bad_product']
                 self.object.good_product = good_product   
+            elif self.object.business.name == '検査':
+                good_product = good_molding - form.cleaned_data['bad_product']
+                self.object.good_product = good_product
             else:
                 self.object.good_product = None
             self.object.save()
@@ -184,7 +207,7 @@ class RepoetStartInspectionView(LoginRequiredMixin,CreateView):
             report = form.save(commit=False)
             report.product = molding.product
             report.lot_number = molding.lot_number
-
+            
             if form.cleaned_data['business']:
                 report.business = form.cleaned_data['business']
             report.save()

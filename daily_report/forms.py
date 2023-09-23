@@ -47,7 +47,7 @@ class ReportEndForm(forms.ModelForm):
     memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.TextInput(attrs={'style': 'width: 200px; height: 100px;'}))
     sets = forms.IntegerField(label='セット数')
     bad_product = forms.IntegerField(label='不良数')
-    quantity = forms.IntegerField(label='数量', disabled=True)
+    quantity = forms.IntegerField(label='取り数', disabled=True)
     
     class Meta:
         model = Report
@@ -84,13 +84,26 @@ class ReportEndForm(forms.ModelForm):
             self.fields[field_name].widget.attrs['readonly'] = 'readonly'
 
         #業務内容が成形以外なら成形数は入力しない
-        if  self.instance and self.instance.business.name != '成形':
+        if  self.instance and self.instance.business.name not in ('成形','検査'):
             self.fields['sets'].required = False
             self.fields['bad_product'].required = False
             self.fields['quantity'].required = False
             self.fields['sets'].widget = forms.HiddenInput()
             self.fields['bad_product'].widget = forms.HiddenInput()
             self.fields['quantity'].widget = forms.HiddenInput()
+
+        #業務内容が検査の場合、good_productの初期値をgood_moldingから持ってくる
+        if self.instance and self.instance .business.name == '検査':
+            lot_number = self.instance.lot_number
+            try:
+                molding = Molding.objects.get(lot_number = lot_number)
+                good_molding = molding.good_molding
+                self.initial['quantity'] = good_molding
+
+                self.fields['quantity'].label = '成形優良数'
+                del self.fields['sets']
+            except Molding.DoesNotExist:
+                self.add_error('good_product', '該当するデータが見つかりませんでした。')
 
 
 #--------------------------------------------------------------------------------------------------

@@ -7,14 +7,23 @@
     <p>製品取り数: {{ reportdetail.product.quantity }}</p>
     <p>ロッドナンバー: {{ reportdetail.lot_number }}</p>
     <p>成形時メモ: {{ reportdetail.product.memo }}</p>
+
+    <!--request.userの部署名が検査部だったら表示-->
+    {% if inspection_good_molding %}
+    <p>成形品優良数: {{ inspection_good_molding }}</p>
+    <p>成形品不良数: {{ inspection_bad_molding }}</p>
+    <p>成形担当者: {{ inspection_molding_user }}</p>
+    {% endif %}
+
     <p>作業者: {{ reportdetail.user.username }}</p>
     <p>作業日時: {{ reportdetail.created_at.year }}/{{ reportdetail.created_at.month }}/{{ reportdetail.created_at.day }}</p>
     <br>
     <p>製品画像</p>
     <img width="300ox" height="300px"src="{{ reportdetail.product.pictures.url }}" alt="{{ reportdetail.product.name }}">
+    
     {% if reportdetail.good_product %}
-    <p>優良成形数：{{ reportdetail.good_product }}</p>
-    <p>不良成形数: {{ reportdetail.bad_product }}</p>
+    <p>優良数：{{ reportdetail.good_product }}</p>
+    <p>不良数: {{ reportdetail.bad_product }}</p>
     <p><a href="{% url 'daily_report:report_end' reportdetail.id %}">結果を編集する</a></p>
     {% else %}
     <p><a href="{% url 'daily_report:report_end' reportdetail.id %}">作業を終了する</a></p>
