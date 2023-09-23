@@ -1,6 +1,7 @@
 from django.db import models
 from accounts.models import Users
 from daily_report.models import Products
+from datetime import datetime
 # Create your models here.
 
 #成形品作成---------------------------------------------------------------
@@ -50,11 +51,12 @@ class Stock(models.Model):
     molding_user = models.ForeignKey(
         Users, on_delete=models.CASCADE, verbose_name='成形担当ユーザー名',null=True,related_name='molding_stock_set',
     )
+    molding_time = models.DateTimeField(verbose_name='成形日時', default=datetime(2001, 1, 1, 0, 0, 0))
     inspection_user = models.ForeignKey(
         Users, on_delete=models.CASCADE, verbose_name='検査担当ユーザー名',null=True,related_name='inspection_stock_set',
     )
     memo = models.CharField(max_length=255,verbose_name="引き継ぎメモ",null=True,blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(verbose_name='検査日時',auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
