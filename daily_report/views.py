@@ -229,6 +229,7 @@ class RepoetStartInspectionView(LoginRequiredMixin,CreateView):
         form.instance.user = self.request.user
         form.instance.status = '実行中'
 
+        #formで選択されたlot_numbeに合う値を取り出す
         molding_lot_number = form.cleaned_data['molding_lot_number']
         molding = Molding.objects.filter(lot_number=molding_lot_number).first()
 

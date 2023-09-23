@@ -2,7 +2,7 @@ from django import forms
 
 from .models import Report
 from .models import Business
-from product_management.models import Molding
+from product_management.models import Molding, Stock
 from accounts.models import Users
 
 #ランダム数値
@@ -123,7 +123,11 @@ class ReportStartInspectionForm(forms.ModelForm):
 
         # Molding モデルから lot_number の値を取得して選択肢としてセットします
         molding_lot_numbers = Molding.objects.values_list('lot_number', flat=True).distinct()
-        molding_choices = [(lot_number, lot_number) for lot_number in molding_lot_numbers]
+        #在庫として送ったlot_numberは検査終了なので、選択肢から除外したい
+        stock_lot_numbers = Stock.objects.values_list('lot_number',flat=True).distinct()
+        unique_molding_lot_number = [lot_number for lot_number in molding_lot_numbers if lot_number not in stock_lot_numbers]
+
+        molding_choices = [(lot_number, lot_number) for lot_number in unique_molding_lot_number]
         self.fields['molding_lot_number'].choices = molding_choices
 
         #ユーザーの部署に合わせて業務内容を表示
