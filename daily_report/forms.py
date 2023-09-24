@@ -1,8 +1,8 @@
 from django import forms
 
 from .models import Report
-from .models import Business
-from product_management.models import Molding, Stock
+from .models import Business,Products
+from product_management.models import Molding, Shipping, Stock
 from accounts.models import Users
 
 #ランダム数値
@@ -14,7 +14,7 @@ class ReportStartForm(forms.ModelForm):
 
     class Meta:
         model = Report
-        fields = ('product', 'business')
+        fields = ['product', 'business']
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -31,12 +31,13 @@ class ReportStartForm(forms.ModelForm):
         if self.user:
             report.user = self.user
 
-        #lot_numberにランダムの整数値を生成する.その時にreportモデルにあるlot_numberと被らないようにする
-        while True:
-            random_value = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
-            if not Report.objects.filter(lot_number=random_value).exists():
-                report.lot_number = random_value
-                break
+        #lot_numberにランダムの整数値を生成する.その時にreportモデルにあるlot_numberと被らないようにする。ユーザー部署が製造部の時だけ
+        if self.user and self.user.department.name == '製造部':
+            while True:
+                random_value = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+                if not Report.objects.filter(lot_number=random_value).exists():
+                    report.lot_number = random_value
+                    break
 
         if commit:
             report.save()
@@ -144,3 +145,55 @@ class ReportStartInspectionForm(forms.ModelForm):
             report.save()
         return report
         
+#--------------------------------------------------------------------------------------------------
+class ReportShippingEndForm(forms.ModelForm):
+    product = forms.IntegerField(label='製品名')
+    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.TextInput(attrs={'style': 'width: 200px; height: 100px;'}))
+
+    class Meta:
+        model = Shipping
+        fields = ['product','user','delivery','shipping_day','shipments_required',
+                  'stock1','stock2','stock3','memo']
+
+    #初期値設定
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(ReportShippingEndForm, self).__init__(*args, **kwargs)
+
+
+        # ユーザーの部署と紐づく業務内容のみを選択肢として表示
+        if self.user and self.user.department:
+            self.fields['user'].queryset = Users.objects.filter(department=self.user.department)
+
+
+        #stock1,stock2,stock3の選択肢を選択した製品名の在庫だけにする
+        product_id = self.initial.get('product')
+        if product_id:
+            #product_idを取得して、product_idをもとにnamaを取得してproductフィールドに保存する
+            product = Products.objects.get(id=product_id)
+            product_name = product.name + ':' + product.code
+            self.fields['product'].initial = product_id
+            self.product_name = product_name
+
+            self.fields['stock1'].queryset = Stock.objects.filter(product = product)
+            self.fields['stock2'].queryset = Stock.objects.filter(product = product)
+            self.fields['stock3'].queryset = Stock.objects.filter(product = product)
+
+
+        #初期値に設定したデータを編集できないようにする
+        for field_name in [ 'product', 'user']:
+            self.fields[field_name].widget.attrs['readonly'] = 'readonly'
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        shipemnts_required = cleaned_data.get('shipments_required',0)
+        stock1 = cleaned_data.get('stock1',0)
+        stock2 = cleaned_data.get('stock2',0)
+        stock3 = cleaned_data.get('stock3',0)
+
+        total = stock1 + stock2 + stock3 
+
+        if shipemnts_required != total:
+            raise forms.ValidationError('在庫選択し直してください')
+        
+        return cleaned_data

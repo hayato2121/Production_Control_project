@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>作業終了</h1>
+<form method="POST">
+    {% csrf_token %}
+    <div>
+        {{ form.product.label_tag }}
+        {{ form.product_name }}
+    </div>
+    <div>
+        {{ form.delivery.label_tag }} 
+        {{ form.delivery }}
+    </div>
+    <div>
+        {{ form.user.label_tag }} 
+        {{ form.user }}
+    </div>
+    <div>
+        {{ form.shipments_required.label_tag }} 
+        {{ form.shipments_required }}
+    </div>
+    <div>
+        {{ form.shipping_day.label_tag }}
+        {{ form.shipping_day }}
+    </div>
+    <div>
+        {{ form.stock1.label_tag }}
+        {{ form.stock1 }}
+    </div>
+    <div>
+        {{ form.stock2.label_tag }}
+        {{ form.stock2 }}
+    </div>
+    <div>
+        {{ form.stock3.label_tag }}
+        {{ form.stock3 }}
+    </div>
+    <div>
+        {{ form.memo.label_tag }}
+        {{ form.memo }}
+    </div>
+    
+    <input type="submit" value="終了する">
+</form>
+<button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>
+{% endblock %}

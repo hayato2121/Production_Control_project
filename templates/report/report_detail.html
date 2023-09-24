@@ -2,6 +2,7 @@
 
 {% block content %}
 <h1>作業詳細</h1>
+    <p>業務内容:{{ reportdetail.business.name }}</p>
     <p>製品名: {{ reportdetail.product.name }}</p>
     <p>製品コード: {{ reportdetail.product.code }}</p>
     <p>製品取り数: {{ reportdetail.product.quantity }}</p>
@@ -22,11 +23,19 @@
     <img width="300ox" height="300px"src="{{ reportdetail.product.pictures.url }}" alt="{{ reportdetail.product.name }}">
     
     {% if reportdetail.good_product %}
-    <p>優良数：{{ reportdetail.good_product }}</p>
-    <p>不良数: {{ reportdetail.bad_product }}</p>
-    <p><a href="{% url 'daily_report:report_end' reportdetail.id %}">結果を編集する</a></p>
+    <p>{{ reportdetail.business.name }}優良数：{{ reportdetail.good_product }}</p>
+    <p>{{ reportdetail.business.name }}不良数: {{ reportdetail.bad_product }}</p>
+        {% if request.user.department.name == '出荷部' %}
+        <p><a href="{% url 'daily_report:report_shippingend' reportdetail.id %}">結果を編集する(出荷部)</a></p>
+        {% else %}
+        <p><a href="{% url 'daily_report:report_end' reportdetail.id %}">結果を編集する</a></p>
+        {% endif %}
     {% else %}
-    <p><a href="{% url 'daily_report:report_end' reportdetail.id %}">作業を終了する</a></p>
+        {% if request.user.department.name == '出荷部' %}
+        <p><a href="{% url 'daily_report:report_shippingend' reportdetail.id %}">作業を終了する(出荷部)</a></p>
+        {% else %}
+        <p><a href="{% url 'daily_report:report_end' reportdetail.id %}">作業を終了する</a></p>
+        {% endif %}
     {% endif %}
 
     <button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>

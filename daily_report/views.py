@@ -6,22 +6,19 @@ from django.views.generic.edit import (
     UpdateView, DeleteView, CreateView
 )
 from django.views.generic import DetailView
-from django.views.generic.base import TemplateView
 
 from django.urls import reverse_lazy
 
 from daily_report.models import Report
-from product_management.models import Molding, Stock
+from product_management.models import Molding, Stock, Shipping
 import os
 
-from .forms import ReportStartForm, ReportEndForm, ReportStartInspectionForm
+from .forms import ReportStartForm, ReportEndForm, ReportStartInspectionForm, ReportShippingEndForm
 
 #ログイン状態
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from datetime import date
-
-from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
 # Create your views here.
@@ -62,9 +59,16 @@ class ReportDetailView(LoginRequiredMixin,DetailView):
             report_lot_number = self.object.lot_number
             molding = Molding.objects.filter(lot_number = report_lot_number).first()
 
-            context['inspection_good_molding'] = molding.good_molding
-            context['inspection_bad_molding'] = molding.bad_molding
-            context['inspection_molding_user'] = molding.user.username
+            if molding:
+                context['inspection_good_molding'] = molding.good_molding
+                context['inspection_bad_molding'] = molding.bad_molding
+                context['inspection_molding_user'] = molding.user.username
+            else:
+                context['inspection_good_molding'] = None
+                context['inspection_bad_molding'] = None
+                context['inspection_molding_user'] = None
+
+
 
         return context
             
@@ -197,12 +201,6 @@ class ReportListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        #作業データ
-        session_data = self.request.session.get('form_data',{})
-
-        task_data = session_data.get('product','business')
-        context['task_data'] = task_data
-
         #ユーザーデータ
         context['user'] = self.request.user
         return context
@@ -251,5 +249,31 @@ class RepoetStartInspectionView(LoginRequiredMixin,CreateView):
 
 
  
-    
+#出荷作業End(検査業務)----------------------------------------------------------------------------------------------------------------------------------------------------------
+class ReportShippingEndView(LoginRequiredMixin,CreateView):
+
+    model = Shipping
+    form_class = ReportShippingEndForm
+    template_name = os.path.join('report', 'report_shipping_end.html')
+    success_url = reverse_lazy('daily_report:report_list')
+
+    # フォームに初期値を渡す
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        # 作業詳細オブジェクトを取得
+        reportdetail = self.get_report_detail()
+
+        if reportdetail.product:
+            kwargs['initial']['product'] = reportdetail.product.id
+        if reportdetail.user:
+            kwargs['initial']['user'] = reportdetail.user.id
+
+        return kwargs
+
+
+    def get_report_detail(self):
+        # 作業詳細オブジェクトを取得するメソッド
+        pk = self.kwargs.get('pk')
+        return get_object_or_404(Report, pk=pk)
 

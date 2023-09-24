@@ -31,7 +31,7 @@ class Molding(models.Model):
 #納品先---------------------------------------------------------------
 class Delivery(models.Model):
     delivery_name = models.CharField(max_length=50,verbose_name='納品先会社名')
-    delivery_code = models.IntegerField(verbose_name='納品先コード')
+    delivery_code = models.CharField(max_length=10,verbose_name='納品先コード')
 
     class Meta:
         verbose_name = '納品先'
@@ -75,20 +75,33 @@ class Stock(models.Model):
 
 #出荷---------------------------------------------------------------
 class Shipping(models.Model):
-    stock = models.ForeignKey(
-        Stock, on_delete=models.PROTECT, verbose_name='在庫情報'
+    product = models.ForeignKey(
+        Products, on_delete=models.PROTECT,verbose_name='製品名',default=''
     )
     delivery = models.ForeignKey(
-        Delivery, on_delete=models.PROTECT, verbose_name='納品先情報'
+        Delivery, on_delete=models.PROTECT, verbose_name='納品先'
+    )
+    user = models.ForeignKey(
+        Users, on_delete=models.CASCADE, verbose_name='ユーザー名',null=True
     )
     shipping_day = models.DateField(verbose_name='出荷日')
+    shipments_required = models.IntegerField(verbose_name='出荷必要数',default=0)
+    memo = models.CharField(max_length=255,verbose_name="引き継ぎメモ",null=True,blank=True)
+    stock1 = models.ForeignKey(
+        Stock, on_delete=models.PROTECT, verbose_name='必要ロッドナンバー1',related_name='stock1_set',null=True
+    )
+    stock2 = models.ForeignKey(
+        Stock, on_delete=models.PROTECT, verbose_name='必要ロッドナンバー2',related_name='stock2_set',null=True
+    )
+    stock3 = models.ForeignKey(
+        Stock, on_delete=models.PROTECT, verbose_name='必要ロッドナンバー3',related_name='stock3_set',null=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = '出荷'
         db_table = 'shipping'
-
 
 
     
