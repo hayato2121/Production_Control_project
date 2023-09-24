@@ -124,10 +124,6 @@ class ReportStartInspectionForm(forms.ModelForm):
 
         # Molding モデルから lot_number の値を取得して選択肢としてセットします
         molding_lot_numbers = Molding.objects.values_list('lot_number', flat=True).distinct()
-        #在庫として送ったlot_numberは検査終了なので、選択肢から除外したい
-        #stock_lot_numbers = Stock.objects.values_list('lot_number',flat=True).distinct()
-        #unique_molding_lot_number = [lot_number for lot_number in molding_lot_numbers if lot_number not in stock_lot_numbers]
-
         molding_choices = [(lot_number, lot_number) for lot_number in molding_lot_numbers] #unique_molding_lot_number]
         self.fields['molding_lot_number'].choices = molding_choices
 
@@ -161,10 +157,13 @@ class ReportShippingEndForm(forms.ModelForm):
         super(ReportShippingEndForm, self).__init__(*args, **kwargs)
 
 
-        # ユーザーの部署と紐づく業務内容のみを選択肢として表示
-        if self.user and self.user.department:
-            self.fields['user'].queryset = Users.objects.filter(department=self.user.department)
-
+        # 出荷部の人しか選べないようにする。
+        if self.user and self.user.department.name == '出荷部':
+            # 出荷部のユーザーのみを選択肢として表示
+            self.fields['user'].queryset = Users.objects.filter(department__name='出荷部')
+        else:
+            # 出荷部のユーザーでない場合は何も表示しない
+            self.fields['user'].queryset = Users.objects.none()
 
         #stock1,stock2,stock3の選択肢を選択した製品名の在庫だけにする
         product_id = self.initial.get('product')

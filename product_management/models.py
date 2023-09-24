@@ -82,7 +82,7 @@ class Shipping(models.Model):
         Delivery, on_delete=models.PROTECT, verbose_name='納品先'
     )
     user = models.ForeignKey(
-        Users, on_delete=models.CASCADE, verbose_name='ユーザー名',null=True
+        Users, on_delete=models.CASCADE, verbose_name='作業者名',null=True
     )
     shipping_day = models.DateField(verbose_name='出荷日')
     shipments_required = models.IntegerField(verbose_name='出荷必要数',default=0)

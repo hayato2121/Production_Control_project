@@ -264,6 +264,8 @@ class ReportShippingEndView(LoginRequiredMixin,CreateView):
         # 作業詳細オブジェクトを取得
         reportdetail = self.get_report_detail()
 
+        kwargs['user'] = self.request.user
+
         if reportdetail.product:
             kwargs['initial']['product'] = reportdetail.product.id
         if reportdetail.user:
