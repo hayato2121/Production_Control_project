@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>作業終了後編集ページ</h1>
+<form method="POST">
+    {% csrf_token %}
+    {% csrf_token %}
+    <div>
+        {{ form.product.label_tag }}
+        {{ form.product }}
+    </div>
+    <div>
+        {{ form.business.label_tag }}
+        {{ form.business }}
+    </div>
+    <div>
+        {{ form.lot_number.label_tag }}
+        {{ form.lot_number }}
+    </div>
+    <div>
+        {{ form.user.label_tag }}
+        {{ form.user }}
+    </div>
+    <div>
+        {{ form.good_product.label_tag }}
+        {{ form.good_product }}
+    </div>
+    <div>
+        {{ form.bad_product.label_tag }}
+        {{ form.bad_product }}
+    </div>
+    <div>
+        {{ form.memo.label_tag }}
+        {{ form.memo }}
+    </div>
+    <input type="submit" value="スタートする">
+</form>
+
+<button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>
+{% endblock %}

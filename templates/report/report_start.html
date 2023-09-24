@@ -4,7 +4,20 @@
 <h1>作業開始ページ</h1>
 <form method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
+    <div>
+        {{ form.product.label_tag }}
+        {{ form.product }}
+    </div>
+    <div>
+        {{ form.business.label_tag }}
+        {{ form.business }}
+    </div>
+    {% if user.department.name == '出荷部' %}
+        <div>
+            {{ form.good_product.label_tag }}
+            {{ form.good_product }}
+        </div>
+    {% endif %}
     <input type="submit" value="スタートする">
 </form>
 

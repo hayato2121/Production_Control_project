@@ -28,7 +28,7 @@
         {% if request.user.department.name == '出荷部' %}
         <p><a href="{% url 'daily_report:report_shippingend' reportdetail.id %}">結果を編集する(出荷部)</a></p>
         {% else %}
-        <p><a href="{% url 'daily_report:report_end' reportdetail.id %}">結果を編集する</a></p>
+        <p><a href="{% url 'daily_report:report_endedit' reportdetail.id %}">結果を編集する</a></p>
         {% endif %}
     {% else %}
         {% if request.user.department.name == '出荷部' %}

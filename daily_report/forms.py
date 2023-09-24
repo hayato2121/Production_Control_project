@@ -14,7 +14,7 @@ class ReportStartForm(forms.ModelForm):
 
     class Meta:
         model = Report
-        fields = ['product', 'business']
+        fields = ['product', 'business','good_product']
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
@@ -23,6 +23,10 @@ class ReportStartForm(forms.ModelForm):
         if self.user and self.user.department:
             # ユーザーの部署と紐づく業務内容のみを選択肢として表示
             self.fields['business'].queryset = Business.objects.filter(department=self.user.department)
+
+            #ユーザーの部署が出荷部の時にgood_productフィールドを追加する
+            #if self.user.department.name == '出荷部':
+                #self.fields['good_product'] = forms.IntegerField(label='出荷量')
 
 
     #userフィールドに自動でリクエストユーザーをする。
@@ -96,7 +100,7 @@ class ReportEndForm(forms.ModelForm):
             self.fields['bad_product'].widget = forms.HiddenInput()
             self.fields['quantity'].widget = forms.HiddenInput()
 
-        #業務内容が検査の場合、good_productの初期値をgood_moldingから持ってくる
+        #業務内容が検査の場合、good_productの初期値をgood_moldingから持ってくる。formの見た目を変えている。
         if self.instance and self.instance .business.name == '検査':
             lot_number = self.instance.lot_number
             try:
@@ -196,3 +200,49 @@ class ReportShippingEndForm(forms.ModelForm):
             raise forms.ValidationError('在庫選択し直してください')
         
         return cleaned_data
+
+
+
+#--------------------------------------------------------------------------------------------------
+class ReportEndEditForm(forms.ModelForm):
+    product = forms.CharField(label='製品名')
+    business = forms.CharField(label='業務内容')
+    bad_product = forms.IntegerField(label='不良数')
+    good_product = forms.IntegerField(label='優良数')
+    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.TextInput(attrs={'style': 'width: 200px; height: 100px;'}))
+    
+    class Meta:
+        model = Report
+        fields = ['user','lot_number','good_product',
+                  'bad_product','memo']
+
+    #初期値設定
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(ReportEndEditForm, self).__init__(*args, **kwargs)
+
+
+        # ユーザーの部署と紐づく業務内容のみを選択肢として表示
+        if self.user and self.user.department:
+            self.fields['business'].queryset = Business.objects.filter(department=self.user.department)
+            self.fields['user'].queryset = Users.objects.filter(department=self.user.department)
+
+        
+        #詳細データからデータを引き出し初期値に登録
+        if 'instance' in kwargs and kwargs['instance']:
+            
+            initial_data ={
+                'product': kwargs['instance'].product,
+                'business': kwargs['instance'].business,
+                'user': kwargs['instance'].user,
+                'lot_number': kwargs['instance'].lot_number,
+                'good_product':kwargs['instance'].good_product,
+                'bad_product':kwargs['instance'].bad_product,
+                'memo': kwargs['instance'].memo
+            }
+            self.initial.update(initial_data)
+
+
+        #初期値に設定したデータを編集できないようにする
+        for field_name in [ 'product', 'business', 'user','lot_number']:
+            self.fields[field_name].widget.attrs['readonly'] = 'readonly'

@@ -13,7 +13,7 @@ from daily_report.models import Report
 from product_management.models import Molding, Stock, Shipping
 import os
 
-from .forms import ReportStartForm, ReportEndForm, ReportStartInspectionForm, ReportShippingEndForm
+from .forms import ReportStartForm, ReportEndForm, ReportStartInspectionForm, ReportShippingEndForm,ReportEndEditForm
 
 #ログイン状態
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -79,6 +79,7 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
     form_class = ReportEndForm
     template_name = os.path.join('report', 'report_end.html')
     success_url = reverse_lazy('daily_report:report_list')
+    
 
 
     def form_valid(self, form):
@@ -175,6 +176,63 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user 
         return kwargs
+    
+#作業終了後編集----------------------------------------------------------------------------------------------------------------------------------------------------------
+class ReportEndEditView(LoginRequiredMixin,UpdateView):
+    model = Report
+    form_class = ReportEndEditForm
+    template_name = os.path.join('report', 'report_end_edit.html')
+    success_url = reverse_lazy('daily_report:report_list')
+
+      #フォームにユーザー情報をわたし、部署ごとの業務内容を選択できるようにする。
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user 
+        return kwargs
+    
+    #endeditで編集した内容を同じlot_numberのmodelとstockにも反映させる
+    def form_valid(self, form):
+        if form.is_valid():
+            if self.object.business.name == '成形':
+                #Molding モデルを更新するための情報を収集
+                good_product = form.cleaned_data['good_product']
+                bad_product = form.cleaned_data['bad_product']
+                user = form.cleaned_data['user']
+                memo = form.cleaned_data['memo']
+
+                #Molding モデルを更新
+                lot_number = self.object.lot_number
+                molding = Molding.objects.filter(lot_number=lot_number).first()
+                
+                if molding:
+                    # 既存のオブジェクトが存在する場合は更新
+                    molding.good_molding = good_product
+                    molding.bad_molding = bad_product
+                    molding.user = user
+                    molding.memo = memo
+                    molding.save()
+
+
+            if self.object.business.name == '検査':
+                #stock モデルを更新するための情報を収集
+                good_product = form.cleaned_data['good_product']
+                user = form.cleaned_data['user']
+                memo = form.cleaned_data['memo']
+                
+                #Stock モデルを更新
+                lot_number = self.object.lot_number
+                stocks = Stock.objects.filter(lot_number=lot_number).first()
+                
+                if stocks:
+                    # 既存のオブジェクトが存在する場合は更新
+                    stocks.stocks = good_product
+                    stocks.inspection_user = user
+                    stocks.memo = memo
+                    stocks.save()
+            
+            return super().form_valid(form)
+
+    
     
     
 
@@ -278,4 +336,4 @@ class ReportShippingEndView(LoginRequiredMixin,CreateView):
         # 作業詳細オブジェクトを取得するメソッド
         pk = self.kwargs.get('pk')
         return get_object_or_404(Report, pk=pk)
-
+   
