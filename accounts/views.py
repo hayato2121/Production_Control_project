@@ -21,4 +21,8 @@ class RegistUserView(CreateView):
     template_name = 'regist_user.html'
     form_class = RegistUserForm
 
+#ログアウト
+class LogoutUserView(LogoutView):
+    pass
+
   

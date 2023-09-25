@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     ReportListView ,ReportStartView ,ReportEndView,ReportDetailView,ReportDeleteView,
-    RepoetStartInspectionView,ReportEndEditView,
+    RepoetStartInspectionView,ReportEndEditView,ReportLogoutConfirm,
     StockEditView,StockListView,
     ShippingStartView,ShippingDetailView,ShippingListView,ShippingDeleteView,ShippingEndView
 )
@@ -24,4 +24,6 @@ urlpatterns = [
 
     path('stocks_list/', StockListView.as_view(), name='stock_list'),
     path('stocks/<int:pk>/edit/', StockEditView.as_view(), name='stock_edit'),
+
+    path('logout/',ReportLogoutConfirm.as_view(),name='logout'),
 ]

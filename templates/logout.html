@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>所属部署:{{ user.department.name }}</h1>
+<h2>本日の作業</h2>
+<!--作業一覧-->
+
+{% if lastreports %}
+    <ul>
+        <table >
+            <thead>
+                <tr>
+                    <td>製品名</td>
+                    <td>製品コード</td>
+                    <td>業務内容</td>
+                    <td>作業者</td>
+                    <td>ロッド番号</td>
+                    <td>作業状況</td>
+                    <td>優良成形数</td>
+                    <td>不良成形数</td>
+                    <td>引き継ぎ</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for report in lastreports %}
+                <tr>
+                    <td>{{ report.product.name }}</td>
+                    <td>{{ report.product.code }}</td>
+                    <td>{{ report.business.name }}</td>
+                    <td>{{ report.user.username }}</td>
+                    <td>{{ report.lot_number }}</td>
+                    <td>{{ report.status }}</td>
+                    <td>{{ report.good_product }}</td>
+                    <td>{{ report.bad_product }}</td>
+                    <td>{{ report.memo }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </ul>
+    {% endif %}
+
+<p>本日の作業を終了しますか？</p>
+<button><a href="{% url 'accounts:logout_user' %}">ログアウトします</a></button>
+<button><a href="{% url 'daily_report:report_list' %}">ログアウトしません(ホームに戻る)</a></button>
+
+{% endblock %}

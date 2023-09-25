@@ -482,6 +482,19 @@ class ShippingEndView(LoginRequiredMixin,UpdateView):
     
     
    
+#日報最終確認---------------------------------------------------------
+class ReportLogoutConfirm(LoginRequiredMixin, ListView):
+    model = Report
+    template_name = os.path.join('logout.html')
+    context_object_name = 'lastreports'
 
 
-   
+    #ログインユーザーしか自分のデータを見ることができない設定
+    def get_queryset(self):
+        today = date.today()
+        user_obj = self.request.user
+        if user_obj.is_authenticated:
+             qs = Report.objects.filter(user=user_obj,created_at__date = today)
+        else:
+            qs = Report.objects.none()
+        return qs
