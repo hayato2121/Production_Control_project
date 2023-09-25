@@ -4,7 +4,7 @@ from .models import Report
 from product_management.models import Molding,Stock
 
 
-# Report(成形)モデルが削除されたら自動的にMoldingオブジェクトを削除するシグナルハンドラ
+# Report(成形)モデルが削除されたら自動的にMoldingオブジェクトを削除するシグナルハンドラ----------------------------------
 @receiver(post_delete, sender=Report)
 def delete_molding(sender, instance, **kwargs):
     # instanceは削除されたReportオブジェクト.reportの業務内容が成形の時だけ
@@ -17,7 +17,7 @@ def delete_molding(sender, instance, **kwargs):
         # すべてのMoldingオブジェクトを削除
         moldings.delete()
 
-# Report(検査)モデルが削除されたら自動的にstockオブジェクトを削除するシグナルハンドラ
+# Report(検査)モデルが削除されたら自動的にstockオブジェクトを削除するシグナルハンドラ----------------------------------
 @receiver(post_delete, sender=Report)
 def delete_stock(sender, instance, **kwargs):
     # instanceは削除されたReportオブジェクト.reportの業務内容が成形の時だけ
@@ -30,6 +30,7 @@ def delete_stock(sender, instance, **kwargs):
         # すべてのMoldingオブジェクトを削除
         stocks.delete()
 
+# Stockが作成した時に同じlot_numberのmoldingを消す----------------------------------
 @receiver(post_save, sender=Stock)
 def update_molding(sender, instance, created, **kwargs):
     # Stock オブジェクトが作成された場合のみ処理を実行
@@ -44,3 +45,10 @@ def update_molding(sender, instance, created, **kwargs):
             # 例えば、以下のように Molding オブジェクトを更新する
             
             molding.delete()
+
+#shipping作成時に在庫が0になったら自動的に削除する----------------------------------
+@receiver(post_save, sender=Stock)
+def update_molding(sender, instance, **kwargs):
+    
+    if instance.stocks == 0:
+        instance.delete()

@@ -64,37 +64,29 @@ class Stock(models.Model):
         db_table = 'stock'
 
     def __str__(self):
-        if self.molding_user and self.inspection_user:
-            return self.product.name + ':' + self.lot_number + ':' + self.molding_user.username + ':' + self.inspection_user.username
-        elif self.molding_user:
-            return self.product.name + ':' + self.lot_number + ':' + self.molding_user.username + ':No Inspection User'
-        elif self.inspection_user:
-            return self.product.name + ':' + self.lot_number + ':No Molding User:' + self.inspection_user.username
-        else:
-            return self.product.name + ':' + self.lot_number + ':No Users'
-
+        return '[' + self.created_at.strftime('%Y-%m-%d') + ']' + ':' + self.product.name + ':' + self.lot_number + ':' +'「' + '在庫数'+ '=' + str(self.stocks) + '」'
 #出荷---------------------------------------------------------------
 class Shipping(models.Model):
     product = models.ForeignKey(
-        Products, on_delete=models.PROTECT,verbose_name='製品名',default=''
+        Products, on_delete=models.CASCADE,verbose_name='製品名',default=''
     )
     delivery = models.ForeignKey(
-        Delivery, on_delete=models.PROTECT, verbose_name='納品先'
+        Delivery, on_delete=models.CASCADE, verbose_name='納品先'
     )
     user = models.ForeignKey(
         Users, on_delete=models.CASCADE, verbose_name='作業者名',null=True
     )
     shipping_day = models.DateField(verbose_name='出荷日')
-    shipments_required = models.IntegerField(verbose_name='出荷必要数',default=0)
+    shipments_required = models.IntegerField(verbose_name='出荷必要数')
     memo = models.CharField(max_length=255,verbose_name="引き継ぎメモ",null=True,blank=True)
     stock1 = models.ForeignKey(
-        Stock, on_delete=models.PROTECT, verbose_name='必要ロッドナンバー1',related_name='stock1_set',null=True
+        Stock, on_delete=models.CASCADE, verbose_name='使用在庫1',related_name='stock1_set',null=True
     )
     stock2 = models.ForeignKey(
-        Stock, on_delete=models.PROTECT, verbose_name='必要ロッドナンバー2',related_name='stock2_set',null=True
+        Stock, on_delete=models.CASCADE, verbose_name='使用在庫2',related_name='stock2_set',null=True
     )
     stock3 = models.ForeignKey(
-        Stock, on_delete=models.PROTECT, verbose_name='必要ロッドナンバー3',related_name='stock3_set',null=True
+        Stock, on_delete=models.CASCADE, verbose_name='使用在庫3',related_name='stock3_set',null=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -102,6 +94,9 @@ class Shipping(models.Model):
     class Meta:
         verbose_name = '出荷'
         db_table = 'shipping'
+
+    def __str__(self):
+        return str(self.delivery) + ':' + self.product.name + ':' + str(self.stock1) + ':' + str(self.stock2) + ':' + str(self.stock3) 
 
 
     

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!--作業一覧-->
+{% if stocks %}
+<ul>
+    <table >
+        <thead>
+            <tr>
+                <td>製品名</td>
+                <td>ロッドナンバー</td>
+                <td>成形担当者</td>
+                <td>成形日時</td>
+                <td>検査担当者</td>
+                <td>検査日時</td>
+                <td>在庫数</td>
+                <td>引き継ぎ</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for stock in stocks %}
+              <tr>
+                <td>{{ stock.product.name }}</td>
+                <td>{{ stock.lot_number }}</td>
+                <td>{{ stock.molding_user }}</td>
+                <td>{{ stock.molding_time }}</td>
+                <td>{{ stock.inspection_user }}</td>
+                <td>{{ stock.created_at }}</td>
+                <td>{{ stock.stocks }}</td>
+                <td>{{ stock.memo }}</td>
+
+                {% if report.good_product is not None %}
+                <td>{{ report.good_product }}</td>
+                <td>{{ report.bad_product }}</td>
+                {% endif %}
+
+                <td><button><a href="{% url 'daily_report:stock_edit' stock.id %}">詳細画面</a></button></td>
+                
+                
+              </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</ul>
+
+{% endif %}
+<a href="{% url 'daily_report:report_list' %}">ホーム画面</a>
+
+{% endblock %}

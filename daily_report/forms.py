@@ -24,10 +24,6 @@ class ReportStartForm(forms.ModelForm):
             # ユーザーの部署と紐づく業務内容のみを選択肢として表示
             self.fields['business'].queryset = Business.objects.filter(department=self.user.department)
 
-            #ユーザーの部署が出荷部の時にgood_productフィールドを追加する
-            #if self.user.department.name == '出荷部':
-                #self.fields['good_product'] = forms.IntegerField(label='出荷量')
-
 
     #userフィールドに自動でリクエストユーザーをする。
     def save(self, commit=True):
@@ -74,7 +70,9 @@ class ReportEndForm(forms.ModelForm):
             self.fields['user'].queryset = Users.objects.filter(department=self.user.department)
 
         
-        #詳細データからデータを引き出し初期値に登録
+        #下のread_onlyだけでは、forinkeyで紐付けされているフィールドは編集できてしまうので、
+        #詳細データからデータを引き出し初期値に登録し、上でフィールドをcharfieldsにすることで
+        #編集できなくし、データにも保存できる。
         if 'instance' in kwargs and kwargs['instance']:
             
             initial_data ={
@@ -85,6 +83,7 @@ class ReportEndForm(forms.ModelForm):
                 'quantity': kwargs['instance'].product.quantity
             }
             self.initial.update(initial_data)
+        
 
 
         #初期値に設定したデータを編集できないようにする
@@ -144,11 +143,34 @@ class ReportStartInspectionForm(forms.ModelForm):
         if commit:
             report.save()
         return report
+    
+#--------------------------------------------------------------------------------------------------
+class ShippingStartForm(forms.ModelForm):
+
+    class Meta:
+        model = Shipping
+        fields = ['product', 'delivery','shipping_day','shipments_required']
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(ShippingStartForm, self).__init__(*args, **kwargs)
+        
+    #userフィールドに自動でリクエストユーザーをする。
+    def save(self, commit=True):
+        shipping = super(ShippingStartForm, self).save(commit=False)
+        if self.user:
+            shipping.user = self.user
+        if commit:
+            shipping.save()
+        return shipping
+
         
 #--------------------------------------------------------------------------------------------------
 class ReportShippingEndForm(forms.ModelForm):
-    product = forms.IntegerField(label='製品名')
     memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.TextInput(attrs={'style': 'width: 200px; height: 100px;'}))
+    sets1 = forms.IntegerField(label='在庫使用1',required = False)
+    sets2 = forms.IntegerField(label='在庫使用2',required = False)
+    sets3 = forms.IntegerField(label='在庫使用3',required = False)
 
     class Meta:
         model = Shipping
@@ -160,6 +182,9 @@ class ReportShippingEndForm(forms.ModelForm):
         self.user = kwargs.pop('user', None)
         super(ReportShippingEndForm, self).__init__(*args, **kwargs)
 
+        self.fields['stock1'].required = False
+        self.fields['stock2'].required = False
+        self.fields['stock3'].required = False
 
         # 出荷部の人しか選べないようにする。
         if self.user and self.user.department.name == '出荷部':
@@ -169,15 +194,11 @@ class ReportShippingEndForm(forms.ModelForm):
             # 出荷部のユーザーでない場合は何も表示しない
             self.fields['user'].queryset = Users.objects.none()
 
-        #stock1,stock2,stock3の選択肢を選択した製品名の在庫だけにする
-        product_id = self.initial.get('product')
-        if product_id:
-            #product_idを取得して、product_idをもとにnamaを取得してproductフィールドに保存する
-            product = Products.objects.get(id=product_id)
-            product_name = product.name + ':' + product.code
-            self.fields['product'].initial = product_id
-            self.product_name = product_name
 
+        #stock1,stock2,stock3の選択肢を選択した製品名の在庫だけにする
+        product  = self.initial.get('product')
+        if product:
+            #product_idを取得して、product_idをもとにnamaを取得してproductフィールドに保存する
             self.fields['stock1'].queryset = Stock.objects.filter(product = product)
             self.fields['stock2'].queryset = Stock.objects.filter(product = product)
             self.fields['stock3'].queryset = Stock.objects.filter(product = product)
@@ -186,22 +207,6 @@ class ReportShippingEndForm(forms.ModelForm):
         #初期値に設定したデータを編集できないようにする
         for field_name in [ 'product', 'user']:
             self.fields[field_name].widget.attrs['readonly'] = 'readonly'
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        shipemnts_required = cleaned_data.get('shipments_required',0)
-        stock1 = cleaned_data.get('stock1',0)
-        stock2 = cleaned_data.get('stock2',0)
-        stock3 = cleaned_data.get('stock3',0)
-
-        total = stock1 + stock2 + stock3 
-
-        if shipemnts_required != total:
-            raise forms.ValidationError('在庫選択し直してください')
-        
-        return cleaned_data
-
-
 
 #--------------------------------------------------------------------------------------------------
 class ReportEndEditForm(forms.ModelForm):
@@ -246,3 +251,120 @@ class ReportEndEditForm(forms.ModelForm):
         #初期値に設定したデータを編集できないようにする
         for field_name in [ 'product', 'business', 'user','lot_number']:
             self.fields[field_name].widget.attrs['readonly'] = 'readonly'
+
+
+#-------------------------------------------------------------------------------------------------
+
+class ReportShippingEndEditForm(forms.ModelForm):
+    
+    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.TextInput(attrs={'style': 'width: 200px; height: 100px;'}))
+    
+    class Meta:
+        model = Shipping
+        fields = ['product','user','delivery','shipping_day','shipments_required',
+                  'stock1','stock2','stock3','memo']
+    
+    
+    #初期値設定
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(ReportShippingEndEditForm, self).__init__(*args, **kwargs)
+
+
+        # ユーザーの部署と紐づく業務内容のみを選択肢として表示
+        if self.user and self.user.department:
+            self.fields['user'].queryset = Users.objects.filter(department=self.user.department)
+
+        
+        #詳細データからデータを引き出し初期値に登録
+        if 'instance' in kwargs and kwargs['instance']:
+            
+            initial_data ={
+                'product': kwargs['instance'].product,
+                'user': kwargs['instance'].user,
+                'delivery': kwargs['instance'].delivery,
+                'shipping_day': kwargs['instance'].shipping_day,
+                'shipments_required': kwargs['instance'].shipments_required,
+                'stock1': kwargs['instance'].stock1,
+                'stock2': kwargs['instance'].stock2,
+                'stock3': kwargs['instance'].stock3,
+                'memo': kwargs['instance'].memo
+            }
+            self.initial.update(initial_data)
+
+#-------------------------------------------------------------------------------------------------
+
+class StockEditForm(forms.ModelForm):
+
+    class Meta:
+        model = Stock
+        fields = [ 'product','lot_number',
+                  'molding_user','inspection_user',
+                  'stocks','memo']
+        
+    def __init__(self, *args, **kwargs):
+        super(StockEditForm, self).__init__(*args, **kwargs)
+
+
+        for field_name in [ 'product','lot_number']:
+            self.fields[field_name].widget.attrs['readonly'] = 'readonly'
+
+        self.fields['molding_user'].queryset = Users.objects.filter(department__name='製造部')
+        self.fields['inspection_user'].queryset = Users.objects.filter(department__name='検査部')
+
+
+#-------------------------------------------------------------------------------------------------
+class ShippingEndForm(forms.ModelForm):
+    product = forms.CharField(label='製品名')
+    delivery = forms.CharField(label='納品先')
+    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.TextInput(attrs={'style': 'width: 200px; height: 100px;'}))
+    sets1 = forms.IntegerField(label='在庫使用1',required = False)
+    sets2 = forms.IntegerField(label='在庫使用2',required = False)
+    sets3 = forms.IntegerField(label='在庫使用3',required = False)
+    
+    class Meta:
+        model = Shipping
+        fields = ['user','shipping_day','shipments_required',
+                  'stock1','stock2','stock3','memo']
+    
+    #初期値設定
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(ShippingEndForm, self).__init__(*args, **kwargs)
+
+        #必須にしない
+        self.fields['stock1'].required = False
+        self.fields['stock2'].required = False
+        self.fields['stock3'].required = False
+
+        # ユーザーの部署と紐づく業務内容のみを選択肢として表示
+        if self.user and self.user.department:
+            self.fields['user'].queryset = Users.objects.filter(department=self.user.department)
+
+
+        #下のread_onlyだけでは、forinkeyで紐付けされているフィールドは編集できてしまうので、
+        #詳細データからデータを引き出し初期値に登録し、上でフィールドをcharfieldsにすることで
+        #編集できなくし、データにも保存できる。
+        if 'instance' in kwargs and kwargs['instance']:
+            
+            initial_data ={
+                'product': kwargs['instance'].product,
+                'delivery': kwargs['instance'].delivery,
+            }
+            self.initial.update(initial_data)
+
+        # 製品フィールドから選択された製品を取得
+        selected_product = self.initial.get('product')
+        # 製品に関連する在庫オブジェクトをクエリして取得し、選択肢として設定
+        if selected_product:
+            self.fields['stock1'].queryset = Stock.objects.filter(product=selected_product)
+            self.fields['stock2'].queryset = Stock.objects.filter(product=selected_product)
+            self.fields['stock3'].queryset = Stock.objects.filter(product=selected_product)
+       
+        #初期値に設定したデータを編集できないようにする
+        for field_name in [ 'product','delivery','shipping_day','shipments_required',]:
+            self.fields[field_name].widget.attrs['readonly'] = 'readonly'
+
+            
+
+

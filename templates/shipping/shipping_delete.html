@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>作業削除(出荷)</h1>
+<p>作業を削除してもよろしいですか？</p>
+<form method="POST">
+    {% csrf_token %}
+    <p>製品名:{{ shipping.product.name }}</p>
+    <p>製品コード: {{ shipping.product.code }}</p>
+    <p>納品先: {{ shipping.delivery }}</p>
+    <p>担当ユーザー: {{ shipping.user.username }}</p>
+    <p>出荷日時: {{ shipping.shipping_day }}</p>
+    <p>出荷量: {{ shipping.shipments_required }}</p>
+    <p>使用在庫１: {{ shipping.stock1}}</p>
+    <p>使用在庫２: {{ shipping.stock2 }}</p>
+    <p>使用在庫３: {{ shipping.stock3 }}</p>
+    <p>使用在庫３: {{ shipping.memo }}</p>
+    
+    
+    <input type="submit" value="削除">
+</form>
+<button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>
+{% endblock %}

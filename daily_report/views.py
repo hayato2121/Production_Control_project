@@ -9,12 +9,13 @@ from django.views.generic import DetailView
 
 from django.urls import reverse_lazy
 
-from daily_report.models import Report
+from daily_report.models import Report, Business
 from product_management.models import Molding, Stock, Shipping
 import os
 
-from .forms import ReportStartForm, ReportEndForm, ReportStartInspectionForm, ReportShippingEndForm,ReportEndEditForm
-
+from .forms import (ReportStartForm, ReportEndForm, ReportStartInspectionForm,
+                    ReportEndEditForm,StockEditForm,ShippingStartForm,ShippingEndForm
+)
 #ログイン状態
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -67,9 +68,6 @@ class ReportDetailView(LoginRequiredMixin,DetailView):
                 context['inspection_good_molding'] = None
                 context['inspection_bad_molding'] = None
                 context['inspection_molding_user'] = None
-
-
-
         return context
             
 
@@ -177,7 +175,8 @@ class ReportEndView(LoginRequiredMixin,UpdateView):
         kwargs['user'] = self.request.user 
         return kwargs
     
-#作業終了後編集----------------------------------------------------------------------------------------------------------------------------------------------------------
+#作業終了後編集-------------------------------------------------------------------------------------------------------------
+
 class ReportEndEditView(LoginRequiredMixin,UpdateView):
     model = Report
     form_class = ReportEndEditForm
@@ -254,13 +253,18 @@ class ReportListView(LoginRequiredMixin, ListView):
         return qs
 
     
-
-    #ユーザーデータをテンプレートに渡す
+    #ShippingListViewのcontext_object_nameのデータを渡している。元々のShippingListViewではできないもよう
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        #ユーザーデータ
-        context['user'] = self.request.user
+        today = date.today()
+        user_obj = self.request.user
+        if user_obj.is_authenticated:
+            context['shippings'] = Shipping.objects.filter(user=user_obj, created_at__date=today)
+        else:
+            context['shippings'] = []  
+
+        context['user'] = user_obj
         return context
     
 
@@ -306,34 +310,178 @@ class RepoetStartInspectionView(LoginRequiredMixin,CreateView):
         return kwargs  
 
 
- 
-#出荷作業End(検査業務)----------------------------------------------------------------------------------------------------------------------------------------------------------
-class ReportShippingEndView(LoginRequiredMixin,CreateView):
+#在庫編集----------------------------------------------------------------------------------------------------------------------------------------------------------
+class StockListView(LoginRequiredMixin, ListView):
+    model = Stock
+    template_name = os.path.join('stock', 'stock_list.html')
+    context_object_name = 'stocks'
+    
 
-    model = Shipping
-    form_class = ReportShippingEndForm
-    template_name = os.path.join('report', 'report_shipping_end.html')
+class StockEditView(LoginRequiredMixin,UpdateView):
+    model = Stock
+    template_name = os.path.join('stock', 'stock_edit.html')
+    form_class = StockEditForm
     success_url = reverse_lazy('daily_report:report_list')
 
-    # フォームに初期値を渡す
+    def form_valid(self, form):
+        stock_id = self.kwargs['pk']  # URLから在庫IDを取得
+        stock = get_object_or_404(Stock, pk=stock_id)  # 在庫オブジェクトを取得
+        
+        return super().form_valid(form)
+    
+    
+
+#出荷編集----------------------------------------------------------------------------------------------------
+class ShippingStartView(LoginRequiredMixin, CreateView):
+    template_name = os.path.join('shipping', 'shipping_start.html')
+    form_class = ShippingStartForm
+    success_url = reverse_lazy('daily_report:report_list')
+
+
+    def form_valid(self, form):
+        # ログインしているユーザー情報をフォームにセット
+        form.instance.user = self.request.user
+        return super(ShippingStartView, self).form_valid(form)
+        
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user  # フォームにユーザー情報を渡す
+        return kwargs  
 
-        # 作業詳細オブジェクトを取得
-        reportdetail = self.get_report_detail()
 
-        kwargs['user'] = self.request.user
+class ShippingListView(LoginRequiredMixin, ListView):
+    model = Shipping
+    template_name = os.path.join('report', 'report_list.html')
+    context_object_name = 'shippings'
 
-        if reportdetail.product:
-            kwargs['initial']['product'] = reportdetail.product.id
-        if reportdetail.user:
-            kwargs['initial']['user'] = reportdetail.user.id
+    #ログインユーザーしか自分のデータを見ることができない設定
+    def get_queryset(self):
+        today = date.today()
+        user_obj = self.request.user
+        if user_obj.is_authenticated:
+             qs = Shipping.objects.filter(user=user_obj,created_at__date = today)
+        else:
+            qs = Shipping.objects.none()
+        return qs
 
+    #ユーザーデータをテンプレートに渡す
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        #ユーザーデータ
+        context['user'] = self.request.user
+        return context
+    
+    
+class ShippingDetailView(LoginRequiredMixin,DetailView):
+    model = Shipping
+    template_name = os.path.join('shipping', 'shipping_detail.html')
+    context_object_name = 'shippingdetail'
+
+    def get_queryset(self):
+        return Shipping.objects.all()
+            
+class ShippingDeleteView(LoginRequiredMixin,DeleteView):
+    model = Shipping
+    success_url = reverse_lazy('daily_report:report_list')
+    template_name = os.path.join('shipping', 'shipping_delete.html')
+    
+
+class ShippingEndView(LoginRequiredMixin,UpdateView):
+    model = Shipping
+    form_class = ShippingEndForm
+    template_name = os.path.join('shipping', 'Shipping_end.html')
+    success_url = reverse_lazy('daily_report:report_list')
+    
+
+    def form_valid(self, form):
+        # フォームのバリデーションが成功した場合の処理
+        cleaned_data = form.cleaned_data
+        shipments_required = cleaned_data.get('shipments_required', 0)
+
+        sets1 = cleaned_data.get('sets1', 0) or 0
+        sets2 = cleaned_data.get('sets2', 0) or 0
+        sets3 = cleaned_data.get('sets3', 0) or 0
+
+        total = sets1 + sets2 + sets3
+
+        error_occurred = False
+
+        if shipments_required != total:
+            form.add_error('sets1', '在庫選択し直してください')
+            form.add_error('sets2', '在庫選択し直してください')
+            form.add_error('sets3', '在庫選択し直してください')
+
+            return self.form_invalid(form)
+    
+        
+        #使用した数値から引いた数を在庫に導入する
+        stock1 = cleaned_data.get('stock1')
+        stock2 = cleaned_data.get('stock2')
+        stock3 = cleaned_data.get('stock3')
+
+        # 選択した在庫からセット数を引いて在庫を更新
+        if stock1 is not None:
+            new_stock1 = stock1.stocks - sets1
+            if new_stock1 < 0:
+                form.add_error('sets1', '在庫が足りません')
+                error_occurred = True  # エラーが発生したことをマーク
+            else:
+                stock1.stocks = new_stock1
+                stock1.save()
+
+
+        if stock2 is not None:
+            new_stock2 = stock2.stocks - sets2
+            if new_stock2 < 0:
+                form.add_error('sets2', '在庫が足りません')
+                error_occurred = True  # エラーが発生したことをマーク
+            else:
+                stock2.stocks = new_stock2
+                stock2.save()
+
+        if stock3 is not None:
+            new_stock3 = stock3.stocks - sets3
+            if new_stock3 < 0:
+                form.add_error('sets3', '在庫が足りません')
+                error_occurred = True  # エラーが発生したことをマーク
+            else:
+                stock3.stocks = new_stock3
+                stock3.save()
+
+        if error_occurred:
+            return self.form_invalid(form)
+        
+        business = Business.objects.get(name='出荷')
+        lot_numbers = ':'.join([str(stock.lot_number) for stock in [stock1, stock2, stock3]])
+        #編集したReportデータを取得しMoldingモデルに同時にCreateする
+        report_data = {
+            'product' : self.object.product,
+            'user': self.object.user,
+            'business': business,
+            'lot_number': lot_numbers,
+            'status': '終了',
+            'good_product': self.object.shipments_required,
+            'memo' : self.object.memo,
+        }
+        report, created = Report.objects.get_or_create(**report_data)
+    
+        return super().form_valid(form)
+    
+    #フォームに初期値を渡す
+    def get_initial(self):
+        initial = super().get_initial()
+
+        return initial
+    
+    #フォームにユーザー情報をわたし、部署ごとの業務内容を選択できるようにする。
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user 
         return kwargs
+    
+    
+   
 
 
-    def get_report_detail(self):
-        # 作業詳細オブジェクトを取得するメソッド
-        pk = self.kwargs.get('pk')
-        return get_object_or_404(Report, pk=pk)
    

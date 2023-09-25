@@ -6,7 +6,7 @@
     {% csrf_token %}
     <div>
         {{ form.product.label_tag }}
-        {{ form.product_name }}
+        {{ form.product}}
     </div>
     <div>
         {{ form.delivery.label_tag }} 
@@ -19,28 +19,49 @@
     <div>
         {{ form.shipments_required.label_tag }} 
         {{ form.shipments_required }}
+        {{ form.shipments_required.errors }}
     </div>
     <div>
         {{ form.shipping_day.label_tag }}
         {{ form.shipping_day }}
+        {{ form.shipping_day.errors }}
     </div>
     <div>
         {{ form.stock1.label_tag }}
         {{ form.stock1 }}
+        {{ form.stock1.errors }}
     </div>
+        <div>
+            {{ form.sets1.label_tag }} 
+            {{ form.sets1 }}
+            {{ form.sets1.errors }}
+        </div>
     <div>
         {{ form.stock2.label_tag }}
         {{ form.stock2 }}
+        {{ form.stock2.errors }}
     </div>
+        <div>
+            {{ form.sets2.label_tag }} 
+            {{ form.sets2 }}
+            {{ form.sets2.errors }}
+        </div>
     <div>
         {{ form.stock3.label_tag }}
         {{ form.stock3 }}
+        {{ form.stock3.errors }}
     </div>
+        <div>
+            {{ form.sets3.label_tag }} 
+            {{ form.sets3 }}
+            {{ form.sets3.errors }}
+        </div>
     <div>
         {{ form.memo.label_tag }}
         {{ form.memo }}
+        {{ form.memo.errors }}
     </div>
-    
+    {{ forms.errors }}
     <input type="submit" value="終了する">
 </form>
 <button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>

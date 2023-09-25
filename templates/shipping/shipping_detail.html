@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>作業詳細</h1>
+    <p>製品名: {{ shippingdetail.product.name }}</p>
+    <p>製品コード: {{ shippingdetail.product.code }}</p>
+    <p>納品先: {{ shippingdetail.delivery }}</p>
+    <p>出荷担当者 {{ shippingdetail.user.username }}</p>
+    <p>出荷日時: {{ shippingdetail.shipping_day }}</p>
+    <p>出荷数: {{ shippingdetail.shipments_required }}</p>
+    <p>引き継ぎ: {{ shippingdetail.memo }}</p>
+    {% if shippingdetail.stock1 %}
+    <p>使用在庫: {{ shippingdetail.stock1 }}</p>
+    <p>使用在庫: {{ shippingdetail.stock2 }}</p>
+    <p>使用在庫: {{ shippingdetail.stock3 }}</p>
+    {% endif %}
+
+    <p><a href="{% url 'daily_report:shipping_end' shippingdetail.id %}">作業を終了する</a></p>
+
+    <button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>
+
+{% endblock %}
