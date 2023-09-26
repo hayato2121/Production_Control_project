@@ -1,4 +1,4 @@
-from typing import Any
+
 from django.shortcuts import render,redirect, get_object_or_404
 
 from django.views.generic.list import ListView
@@ -20,7 +20,6 @@ from .forms import (ReportStartForm, ReportEndForm, ReportStartInspectionForm,
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from datetime import date
-from django.dispatch import receiver
 
 # Create your views here.
     

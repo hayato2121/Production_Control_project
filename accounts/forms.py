@@ -31,4 +31,26 @@ class RegistUserForm(forms.ModelForm):
         user.set_password(self.cleaned_data['password'])
         user.save()
         return user
+    
+
+#staffuser作成
+class StaffUserForm(RegistUserForm):
+
+    is_staff = forms.BooleanField(
+        required=False,
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+    )
+
+    class Meta:
+        model = Users
+        fields = RegistUserForm.Meta.fields + ('is_staff',)
+
+    #パスワードの暗号化
+    def save(self, commit=False):
+        user = super().save(commit=False)
+        validate_password(self.cleaned_data['password'],user)
+        user.set_password(self.cleaned_data['password'])
+        user.save()
+        return user
 
