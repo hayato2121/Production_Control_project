@@ -3,6 +3,9 @@ from django.dispatch import receiver
 from .models import Report
 from product_management.models import Molding,Stock
 
+from accounts.models import Users
+from django.contrib.auth.models import Group
+
 
 # Report(成形)モデルが削除されたら自動的にMoldingオブジェクトを削除するシグナルハンドラ----------------------------------
 @receiver(post_delete, sender=Report)
@@ -52,3 +55,12 @@ def update_molding(sender, instance, **kwargs):
     
     if instance.stocks == 0:
         instance.delete()
+
+#is_staffアカウントが作成されたら、自動でstaffグループに入れるシグナル
+@receiver(post_save, sender=Users)
+def staff_user_add_group(sender, instance, created, **kwargs):
+    if created and instance.is_staff:
+        staff_group = Group.objects.get(name='staff')
+        instance.groups.add(staff_group)
+
+

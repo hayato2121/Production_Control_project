@@ -11,10 +11,10 @@ class LoginUserForm(AuthenticationForm):
 
 #入社登録
 class RegistUserForm(forms.ModelForm):
-    username = forms.CharField(label='名前')
-    birthday = forms.DateField(label='生年月日')
-    phone = forms.IntegerField(label='緊急連絡先番号',required=False)
-    email = forms.EmailField(label='連絡先メールアドレス',required=False)
+    username = forms.CharField(label='名前',widget=forms.TextInput(attrs={'placeholder': '間の空白なし[山田太郎]'}))
+    birthday = forms.DateField(label='生年月日',widget=forms.TextInput(attrs={'placeholder': '2000-01-01'}))
+    phone = forms.IntegerField(label='緊急連絡先番号',required=True,widget=forms.TextInput(attrs={'placeholder': 'ハイフンなしで入力してください'}))
+    email = forms.EmailField(label='連絡先メールアドレス',required=True,widget=forms.TextInput(attrs={'placeholder': 'your_email@example.com'}))
     department = forms.ModelChoiceField(queryset=Departments.objects,
         label='所属部署', 
         required=True,)
@@ -40,6 +40,7 @@ class StaffUserForm(RegistUserForm):
         required=False,
         initial=True,
         widget=forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        label='管理者'
     )
 
     class Meta:

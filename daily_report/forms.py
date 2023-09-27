@@ -146,6 +146,7 @@ class ReportStartInspectionForm(forms.ModelForm):
     
 #--------------------------------------------------------------------------------------------------
 class ShippingStartForm(forms.ModelForm):
+    shipping_day = forms.DateField(label='出荷日',widget=forms.TextInput(attrs={'placeholder': '2000-01-01'}))
 
     class Meta:
         model = Shipping
