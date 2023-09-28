@@ -7,11 +7,42 @@
     <title>{% block title %} home {% endblock title %}</title>
 </head>
 <body>
-    <nav>
-        <a href="{% url 'daily_report:report_list' %}">ホーム画面</a>
-        <h1>{{ request.user.username }}さん</h1>
-    </nav>
+    <table>
+        <tr>
+            <td><h2>「作業日報&生産管理」</h2></td>
+            <td><p>{{ request.user.username }}さん</p></td>
+            {% if request.user.is_staff %}
+            <td><button><a href="{% url 'product_management:staff_home' %}">ホーム画面</a></button></td>
+            <td><button><a href="{% url 'accounts:logout_user' %}">ログアウト</a></button></td>
+            {% else %}
+            <td><button><a href="{% url 'daily_report:report_list' %}">ホーム画面</a></button></td>
+            <td></td>
+            <td>
+                <button onclick="confirmLogout()"><a href="#">ログアウトします</a></button>
+            </td>
+            {% endif %}
+        </tr>
+    </table>
+    <hr>
+    {% if request.user.is_staff %}
+    <p><a href="">業務内容作成</a></p>
+    <p><a href="">製造情報作成</a></p>    
+    <p><a href="">製品ごとの１ヶ月の生産数(日報から)</a></p> 
+    <p><a href="">製造者の１ヶ月の生産数(日報から)</a></p> 
+    <p><a href="">製品ごとの在庫一覧</a></p>         
+    <hr>  
+    {% endif %}
+
+
     {% block content %}
     {% endblock %}
+
+    <script>
+        function confirmLogout() {
+            if (confirm("実行中の作業を終了してからログアウトすることをお勧めします。一日経つとデータを編集できなくなります。")) {
+                window.location.href = "{% url 'accounts:logout_user' %}";
+            }
+        }
+    </script>
 </body>
 </html>

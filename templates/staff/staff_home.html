@@ -1,1 +1,32 @@
-<p>Staff</p>
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>出勤状況</h2>
+
+<h3>製造部</h3>
+<ul>
+    {% for user in department_users %}
+        {% if user.department.name == '製造部' %}
+            <li>{{ user.username }}</li>
+        {% endif %}
+    {% endfor %}
+</ul>
+
+<h3>検査部</h3>
+<ul>
+    {% for user in department_users %}
+        {% if user.department.name == '検査部' %}
+            <li>{{ user.username }}</li>
+        {% endif %}
+    {% endfor %}
+</ul>
+
+<h3>出荷部</h3>
+<ul>
+    {% for user in department_users %}
+        {% if user.department.name == '出荷部' %}
+            <li>{{ user.username }}</li>
+        {% endif %}
+    {% endfor %}
+</ul>
+{% endblock %}
