@@ -3,6 +3,25 @@
 {% block content %}
 <h1>成形者別の生産実績</h1>
 
+
+<form method="GET">
+    {{ form.as_p }}
+    <button type="submit">表示</button>
+</form>
+
+{% if chart_image %}
 <img src="data:image/png;base64, {{ chart_image }}" alt="生産グラフ">
+{% endif %}
+
+{% for username, user_data in user_product_data.items %}
+    <p>ユーザー: {{ username }}</p>
+    <ul>
+        {% for product_name, product_info in user_data.products.items %}
+        <p>製品名: {{ product_name }} - 優良数: {{ product_info.good_product }} - 不良数: {{ product_info.bad_product }}</p>
+        {% endfor %}
+        <p>総優良数: {{ user_data.total_good_product }}</p>
+        <p>総不良数: {{ user_data.total_bad_product }}</p>
+    </ul>
+{% endfor %}
 
 {% endblock %}

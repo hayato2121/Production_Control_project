@@ -10,9 +10,12 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
 from django.views import View
 
+from .forms import GraphYearMonthForm
+
 import os
 
 import matplotlib
+import japanize_matplotlib #グラフを文字化けしないようにする
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from django.db.models import Sum
@@ -54,60 +57,223 @@ class StaffHomeView(TemplateView):
  
 
 
-#日報の集計グラフ
+#日報の集計グラフ------------------------------------------------------------------------
 class StaffReportUserGraphView(View):
     template_name = os.path.join('staff', 'staff_reportusergraph.html')
 
     def get(self, request, *args, **kwargs):
 
-        users = Users.objects.filter(department__name='製造部')
-        products = Products.objects.all()
+        #月と年を入力するフォーム
+        form = GraphYearMonthForm(request.GET)
+        # フォームが送信され、バリデーションが成功した場合
+        if form.is_valid():
+            year = form.cleaned_data['year']
+            month = form.cleaned_data['month']
+            users = Users.objects.filter(department__name='製造部')
+            products = Products.objects.all()
 
-        user_data = {}  # ユーザーごとのデータを格納する辞書
+            user_data = {}  # ユーザーごとの優良数を入れる
+        
+            for user in users:
+                user_data[user.username] = {product.name: 0 for product in products}
+            #製品ごとの合計数
+            for product in products:
+                #優良数
+                product_good_data = Report.objects.filter(
+                    product=product, created_at__year=year, created_at__month=month,business__name='成形'
+                    ).values('user__username').annotate(total_good_product=Sum('good_product'))
+                for entry in product_good_data:
+                    username = entry['user__username']
+                    total_good_product = entry['total_good_product'] or 0
+                    if username in user_data:
+                        user_data[username][product.name] = total_good_product
 
-        for user in users:
-            user_data[user.username] = {product.name: 0 for product in products}
+            # グラフにデータを設定
+            labels = [user.username for user in users]
+            x = range(len(users))
 
-        for product in products:
-            product_good_data = Report.objects.filter(product=product).values('user__username').annotate(total_good_product=Sum('good_product'))
-            for entry in product_good_data:
-                username = entry['user__username']
-                total_good_product = entry['total_good_product'] or 0
-                if username in user_data:
-                    user_data[username][product.name] = total_good_product
+            # グラフ描写
+            plt.figure(figsize=(9, 4))
 
-        # グラフにデータを設定
-        labels = [user.username for user in users]
-        x = range(len(users))
+            plt.ylim(0, 100000) #y軸のラベルの範囲を指定0から1000000
 
-        # グラフ描写
-        plt.figure(figsize=(12, 6))
+            # ユーザごとにデータを積み上げて描写
+            bottom_data = np.zeros(len(users), dtype=float)
+            for product in products:
+                product_good_data = [user_data[user.username][product.name] for user in users]
+                plt.bar(x, product_good_data, label=product.name, bottom=bottom_data)
+                bottom_data += product_good_data
 
-        plt.ylim(0, 100000) #y軸のラベルの範囲を指定0から1000000
+            plt.xlabel('ユーザー',)
+            plt.ylabel('優良数',)
+            plt.xticks(x, labels, rotation=45)
+            plt.tight_layout()
+            plt.legend()
 
-        # ユーザごとにデータを積み上げて描写
-        bottom_data = np.zeros(len(users), dtype=float)
-        for product in products:
-            product_good_data = [user_data[user.username][product.name] for user in users]
-            plt.bar(x, product_good_data, label=product.name, bottom=bottom_data)
-            bottom_data += product_good_data
+            # y軸の数に合わせた横線を追加
+            for y_value in range(0, 100001, 20000):  # 適切な間隔を設定してください
+                plt.axhline(y_value, color='gray', linestyle='--', linewidth=0.5)
+
+            # グラフを画像ファイルとして保存
+            image_stream = io.BytesIO()
+            plt.savefig(image_stream, format='png')
+            image_stream.seek(0)
+            image_base64 = base64.b64encode(image_stream.read()).decode('utf-8')
+            plt.close()
+
+            #テキスト状に集計結果を表示----------------------------------------------------------------------------------
+            report_data = Report.objects.filter(product__in=products, created_at__year=year, created_at__month=month, business__name='成形')
+
+            user_product_data = {}
+            for user in users:
+                user_product_data[user.username] = {
+                    'products': {},
+                    'total_good_product': 0,
+                    'total_bad_product': 0
+                }
+
+            # クエリの結果を整理
+            for entry in report_data:
+                username = entry.user.username
+                product_name = entry.product.name
+                good_product = entry.good_product or 0
+                bad_product = entry.bad_product or 0
+
+                if product_name not in user_product_data[username]['products']:
+                    user_product_data[username]['products'][product_name] = {
+                        'good_product': 0,
+                        'bad_product': 0
+                    }
+
+                user_product_data[username]['products'][product_name]['good_product'] += good_product
+                user_product_data[username]['products'][product_name]['bad_product'] += bad_product
+                user_product_data[username]['total_good_product'] += good_product
+                user_product_data[username]['total_bad_product'] += bad_product
+            #---------------------------------------------------------------------------------------------------------
 
 
-        plt.xlabel('ユーザー',)
-        plt.ylabel('優良数',)
-        plt.xticks(x, labels, rotation=45)
-        plt.tight_layout()
-        plt.legend(prop = {'family' : 'IPAexGothic'})
+            context = {
+                'chart_image': image_base64,  
+                'form': form,
+                'user_product_data': user_product_data,
+            }
 
-        # グラフを画像ファイルとして保存
-        image_stream = io.BytesIO()
-        plt.savefig(image_stream, format='png')
-        image_stream.seek(0)
-        image_base64 = base64.b64encode(image_stream.read()).decode('utf-8')
-        plt.close()
-
+            return render(request, self.template_name, context)
+    
+        # フォームがバリデーションに失敗した場合
         context = {
-            'chart_image': image_base64,
+            'chart_image': None, 
+            'form': form,  
         }
+        return render(request, self.template_name, context)
+    
 
+
+#製品ごとの成形数----------------------------------------------------------------------------
+class StaffReportProductGraphView(View):
+    template_name = os.path.join('staff', 'staff_reportproductgraph.html')
+
+
+    def get(self, request, *args, **kwargs):
+
+        #月と年を入力するフォーム
+        form = GraphYearMonthForm(request.GET)
+        # フォームが送信され、バリデーションが成功した場合
+        if form.is_valid():
+            year = form.cleaned_data['year']
+            month = form.cleaned_data['month']
+            products = Products.objects.all()
+
+            product_data = {}  # ユーザーごとの優良数を入れる
+        
+            for product in products:
+                product_data[product.name] = {
+                    'total_good_product': 0,
+                    'total_bad_product': 0,
+                }
+
+            #製品ごとの合計数
+            for product in products:
+                #優良数
+                product_molding_data = Report.objects.filter(
+                    product=product, created_at__year=year, created_at__month=month,business__name='成形'
+                    ).values('user__username').annotate(total_good_product=Sum('good_product'),total_bad_product=Sum('bad_product'))
+                total_good_product = product_molding_data.aggregate(total_good_product=Sum('good_product'))['total_good_product'] or 0
+                total_bad_product = product_molding_data.aggregate(total_bad_product=Sum('bad_product'))['total_bad_product'] or 0
+                product_data[product.name] = {
+                    'total_good_product': total_good_product,
+                    'total_bad_product': total_bad_product,
+                }
+
+
+            # グラフにデータを設定
+
+            products_count = Products.objects.count()
+            labels = [product.name for product in products]
+            x = range(products_count)
+
+            # グラフ描写
+            plt.figure(figsize=(9, 4))
+            plt.ylim(0, 100000) #y軸のラベルの範囲を指定0から1000000
+
+            product_good_data = [product_data[product.name]['total_good_product'] for product in products]
+            product_bad_data = [product_data[product.name]['total_bad_product'] for product in products]
+
+            width = 0.35  # バーの幅を調整
+
+            plt.bar(x, product_good_data, width, align='edge', label='優良数', alpha=0.7)
+            plt.bar(x, product_bad_data, width, align='center', label='不良数', alpha=0.7)
+
+            
+            plt.xlabel('製品名',)
+            plt.ylabel('優良数',)
+            plt.xticks(x, labels, rotation=45)
+            plt.tight_layout()
+            plt.legend()
+
+            # y軸の数に合わせた横線を追加
+            for y_value in range(0, 100001, 20000):  # 適切な間隔を設定してください
+                plt.axhline(y_value, color='gray', linestyle='--', linewidth=0.5)
+
+            # グラフを画像ファイルとして保存
+            image_stream = io.BytesIO()
+            plt.savefig(image_stream, format='png')
+            image_stream.seek(0)
+            image_base64 = base64.b64encode(image_stream.read()).decode('utf-8')
+            plt.close()
+
+            #テキスト状に集計結果を表示----------------------------------------------------------------------------------
+            report_data = Report.objects.filter(product__in=products, created_at__year=year, created_at__month=month, business__name='成形')
+
+            products_data = {}
+            for product in products:
+                products_data[product.name] = {
+                    'total_good_product': 0,
+                    'total_bad_product': 0
+                }
+
+            # クエリの結果を整理
+            for entry in report_data:
+                product_name = entry.product.name
+                good_product = entry.good_product or 0
+                bad_product = entry.bad_product or 0
+
+                products_data[product_name]['total_good_product'] += good_product
+                products_data[product_name]['total_bad_product'] += bad_product
+
+            #---------------------------------------------------------------------------------------------------------
+
+            context = {
+                'chart_image': image_base64,  
+                'form': form,
+                'products_data': products_data,
+            }
+
+            return render(request, self.template_name, context)
+    
+        # フォームがバリデーションに失敗した場合
+        context = {
+            'chart_image': None, 
+            'form': form,  
+        }
         return render(request, self.template_name, context)

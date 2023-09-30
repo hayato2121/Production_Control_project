@@ -142,3 +142,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_REDIRECT_URL = '/daily_report/report_list' #ログイン後のリダイレクト先の変更
 LOGOUT_REDIRECT_URL ='/accounts/home' #ログアウト後のリダイレクト先変更
 LOGIN_URL = '/accounts/home' #loginrequiredで弾かれたときに自動でログインフォームにリダイレクする
+

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>製品別の生産数</h1>
+
+
+<form method="GET">
+    {{ form.as_p }}
+    <button type="submit">表示</button>
+</form>
+
+{% if chart_image %}
+<img src="data:image/png;base64, {{ chart_image }}" alt="生産グラフ">
+{% endif %}
+
+{% for name, product_info in products_data.items %}
+    <p>製品名: {{ name }}</p>
+    <ul>
+        {% for product_name, product_data in product_info.products.items %}
+        <p>製品名: {{ product_name }} - 優良数: {{ product_data.good_product }} - 不良数: {{ product_data.bad_product }}</p>
+        {% endfor %}
+        <p>総優良数: {{ product_info.total_good_product }}</p>
+        <p>総不良数: {{ product_info.total_bad_product }}</p>
+    </ul>
+{% endfor %}
+
+
+
+{% endblock %}
