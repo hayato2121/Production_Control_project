@@ -10,7 +10,6 @@ class Products(models.Model):
     name = models.CharField(max_length=255,verbose_name="製品名")
     code = models.CharField(max_length=50,verbose_name="製品コード")
     quantity = models.IntegerField(verbose_name="製品取り数")
-    pictures = models.FileField(upload_to='product_pictures',verbose_name='製品画像',null=True)
     memo = models.CharField(max_length=255,blank=True, null=True,verbose_name="製品メモ")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

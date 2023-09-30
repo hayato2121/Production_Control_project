@@ -23,8 +23,6 @@
     <p>作業者: {{ reportdetail.user.username }}</p>
     <p>作業日時: {{ reportdetail.created_at.year }}/{{ reportdetail.created_at.month }}/{{ reportdetail.created_at.day }}</p>
     <br>
-    <p>製品画像</p>
-    <img width="300ox" height="300px"src="{{ reportdetail.product.pictures.url }}" alt="{{ reportdetail.product.name }}">
     
     {% if reportdetail.good_product %}
     <p>{{ reportdetail.business.name }}優良数：{{ reportdetail.good_product }}</p>
