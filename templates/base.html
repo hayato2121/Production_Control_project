@@ -27,7 +27,7 @@
     {% if request.user.is_staff %}
     <p><a href="">業務内容作成</a></p>
     <p><a href="">製造情報作成</a></p>    
-    <p><a href="">製品ごとの１ヶ月の生産数(日報から)</a></p> 
+    <p><a href="{% url 'product_management:staff_reportusergraph' %}">ユーザーごとの１ヶ月ごとの生産数(日報から)</a></p> 
     <p><a href="">製造者の１ヶ月の生産数(日報から)</a></p> 
     <p><a href="">製品ごとの在庫一覧</a></p>         
     <hr>  
