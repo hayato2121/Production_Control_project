@@ -3,9 +3,12 @@
 {% block content %}
 
 <!--作業一覧-->
-{% if stocks %}
+{% if grouped_stocks %}
 <ul>
-    <table >
+    {% for grouped_stock in grouped_stocks %}
+    <h2>{{ grouped_stock.product__name }}</h2> <!-- Display the product name as a header -->
+
+    <table>
         <thead>
             <tr>
                 <td>製品名</td>
@@ -20,6 +23,7 @@
         </thead>
         <tbody>
             {% for stock in stocks %}
+              {% if stock.product.name == grouped_stock.product__name %}
               <tr>
                 <td>{{ stock.product.name }}</td>
                 <td>{{ stock.lot_number }}</td>
@@ -35,16 +39,24 @@
                 <td>{{ report.bad_product }}</td>
                 {% endif %}
 
-                <td><button><a href="{% url 'daily_report:stock_edit' stock.id %}">詳細画面</a></button></td>
-                
-                
+                <!--管理画面でも使うので、管理ユーザーの時は表示しないようにする。-->
+                {% if not request.user.is_staff %}
+                <td><button><a href="{% url 'daily_report:stock_edit' stock.id %}">編集する</a></button></td>
+                {% endif %}
               </tr>
+              {% endif %}
             {% endfor %}
         </tbody>
     </table>
+    <p>{{ grouped_stock.product__name }}合計在庫数: {{ grouped_stock.total_stocks }}</p>
+    {% endfor %}
 </ul>
-
 {% endif %}
+
+{% if request.user.is_staff %}
+<a href="{% url 'product_management:staff_home' %}">ホーム画面(staff)</a>
+{% else %}
 <a href="{% url 'daily_report:report_list' %}">ホーム画面</a>
+{% endif %}
 
 {% endblock %}

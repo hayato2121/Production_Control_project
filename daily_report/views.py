@@ -9,12 +9,14 @@ from django.views.generic import DetailView
 
 from django.urls import reverse_lazy
 
+from django.db.models import Sum
 from daily_report.models import Report, Business
 from product_management.models import Molding, Stock, Shipping
 import os
 
 from .forms import (ReportStartForm, ReportEndForm, ReportStartInspectionForm,
-                    ReportEndEditForm,StockEditForm,ShippingStartForm,ShippingEndForm
+                    ReportEndEditForm,StockEditForm,ShippingStartForm,ShippingEndForm,
+                    
 )
 #ログイン状態
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -314,7 +316,16 @@ class StockListView(LoginRequiredMixin, ListView):
     model = Stock
     template_name = os.path.join('stock', 'stock_list.html')
     context_object_name = 'stocks'
-    
+
+    #製品ごとの合計を計算して表示する
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        grouped_stocks = Stock.objects.values('product__name').annotate(total_stocks=Sum('stocks'))
+
+        context['grouped_stocks'] = grouped_stocks
+        return context
+
 
 class StockEditView(LoginRequiredMixin,UpdateView):
     model = Stock
@@ -452,7 +463,7 @@ class ShippingEndView(LoginRequiredMixin,UpdateView):
             return self.form_invalid(form)
         
         business = Business.objects.get(name='出荷')
-        lot_numbers = ':'.join([str(stock.lot_number) for stock in [stock1, stock2, stock3]])
+        lot_numbers = ':'.join([str(stock.lot_number) for stock in [stock1, stock2, stock3] if stock is not None])
         #編集したReportデータを取得しMoldingモデルに同時にCreateする
         report_data = {
             'product' : self.object.product,

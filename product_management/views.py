@@ -8,6 +8,13 @@ from daily_report.models import Report, Products
 from django.contrib.auth.decorators import login_required
 
 from django.views.generic import TemplateView
+from django.views.generic.edit import (
+    UpdateView, DeleteView, CreateView
+)
+from datetime import datetime
+from .forms import StaffProductCreateForm, StaffBusinessCreateForm
+from django.urls import reverse_lazy
+
 from django.views import View
 
 from .forms import GraphYearMonthForm
@@ -169,7 +176,7 @@ class StaffReportUserGraphView(View):
     
 
 
-#製品ごとの成形数----------------------------------------------------------------------------
+#製品ごとの成形数------------------------------------------------------------------------------------------------------
 class StaffReportProductGraphView(View):
     template_name = os.path.join('staff', 'staff_reportproductgraph.html')
 
@@ -277,3 +284,28 @@ class StaffReportProductGraphView(View):
             'form': form,  
         }
         return render(request, self.template_name, context)
+    
+
+#製品情報入力------------------------------------------------------------------------------------------------------
+class StaffProductCreateView(CreateView):
+    template_name = os.path.join('staff', 'staff_product_create.html')
+    form_class = StaffProductCreateForm
+    success_url = reverse_lazy('product_management:staff_home')
+
+    def form_valid(self, form):
+        form.instance.create_at = datetime.now()
+        form.instance.update_at = datetime.now()
+        return super(StaffProductCreateView, self).form_valid(form)
+
+
+#業務内容作成------------------------------------------------------------------------------------------------------
+class StaffBusinessCreateView(CreateView):
+    template_name = os.path.join('staff', 'staff_business_create.html')
+    form_class = StaffBusinessCreateForm
+    success_url = reverse_lazy('product_management:staff_home')
+
+    def form_valid(self, form):
+        form.instance.create_at = datetime.now()
+        form.instance.update_at = datetime.now()
+        return super(StaffBusinessCreateView, self).form_valid(form)
+

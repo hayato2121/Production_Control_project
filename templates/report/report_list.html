@@ -27,7 +27,7 @@
                                 <td>{{ shipping.shipping_day }}</td>
                                 <td>{{ shipping.shipments_required }}</td>
                                 <td>{{ shipping.memo }}</td>
-                                {% if shipping.stock1 %}
+                                {% if shipping.stock1 or shipping.stock2 or shipping.stock3 %}
                                 <td>終了</td>
                                 {% else %}
                                 <td>実行中</td>

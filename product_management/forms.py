@@ -1,4 +1,6 @@
 from django import forms
+from daily_report.models import Products, Business
+from datetime import datetime
 
 #年と月の選択肢
 YEAR_CHOICES = [(year, str(year)) for year in range(2020, 2026)]  # 2020年から2030年までの範囲を選択肢にする例
@@ -13,3 +15,19 @@ MONTH_CHOICES = [
 class GraphYearMonthForm(forms.Form):
     year = forms.ChoiceField(choices=YEAR_CHOICES, label='年')
     month = forms.ChoiceField(choices=MONTH_CHOICES, label='月')
+
+
+#製品作成フォーム
+class StaffProductCreateForm(forms.ModelForm):
+
+    class Meta:
+        model = Products
+        fields = ['name', 'code' , 'quantity', 'memo']
+
+
+#業務内容作成フォーム
+class StaffBusinessCreateForm(forms.ModelForm):
+
+    class Meta:
+        model = Business
+        fields = ['department', 'name' , 'business_content']
