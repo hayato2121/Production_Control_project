@@ -3,6 +3,7 @@
 {% block content %}
 
 <!--作業一覧-->
+<h1>在庫リスト</h1>
 {% if grouped_stocks %}
 <ul>
     {% for grouped_stock in grouped_stocks %}
@@ -39,10 +40,9 @@
                 <td>{{ report.bad_product }}</td>
                 {% endif %}
 
-                <!--管理画面でも使うので、管理ユーザーの時は表示しないようにする。-->
-                {% if not request.user.is_staff %}
-                <td><button><a href="{% url 'daily_report:stock_edit' stock.id %}">編集する</a></button></td>
-                {% endif %}
+                <td><button><a href="{% url 'daily_report:stock_edit' stock.id %}">編集</a></button></td>
+                <td><button><a href="{% url 'daily_report:stock_delete' stock.id %}">削除</a></button></td>
+                
               </tr>
               {% endif %}
             {% endfor %}

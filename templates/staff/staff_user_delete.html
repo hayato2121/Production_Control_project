@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>ユーザー削除</h1>
+<p>ユーザーを削除してもよろしいですか？</p>
+<form method="POST">
+    {% csrf_token %}
+    <p>ユーザー名:{{ users.username }}</p>
+    <p>生年月日:{{ users.birthday }}</p>
+    <p>電話番号:{{ users.phone }}</p>
+    <p>メールアドレス:{{ users.email }}</p>
+    <p>部署名:{{ users.department }}</p>
+    <input type="submit" value="削除">
+</form>
+<button><a href="{% url 'product_management:staff_user_list' %}">ユーザー一覧に戻る</a></button>
+{% endblock %}

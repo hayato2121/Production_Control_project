@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>在庫削除</h1>
+<p>在庫を削除してもよろしいですか？</p>
+<form method="POST">
+    {% csrf_token %}
+    <p>製品名:{{ stock.product.name }}</p>
+    <p>ロッドナンバー:{{ stock.lot_number }}</p>
+    <p>成形担当者:{{ stock.molding_user }}</p>
+    <p>成形日時:{{ stock.molding_time }}</p>
+    <p>検査担当者:{{ stock.inspection_user }}</p>
+    <p>検査日時:{{ stock.created_at }}</p>
+    <p>在庫数:{{ stock.stocks }}</p>
+    <p>引き継ぎ:{{ stock.memo }}</p>
+    
+    
+    <input type="submit" value="削除">
+</form>
+
+<a href="{% url 'daily_report:stock_list' %}">在庫一覧画面に戻る</a>
+
+{% endblock %}

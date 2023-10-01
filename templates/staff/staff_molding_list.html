@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- 成形品一覧 -->
+{% if grouped_molding %}
+<ul>
+    {% for grouped_molding_item in grouped_molding %}
+    <h2>{{ grouped_molding_item.product__name }}</h2> <!-- Display the product name as a header -->
+
+    <table>
+        <thead>
+            <tr>
+                <td>製品名</td>
+                <td>ロッド番号</td>
+                <td>優良成形数</td>
+                <td>不良成形数</td>
+                <td>成形担当者</td>
+                <td>引き継ぎメモ</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for molding in staffmolding %}
+              {% if molding.product.name == grouped_molding_item.product__name %}
+              <tr>
+                <td>{{ molding.product.name }}</td>
+                <td>{{ molding.lot_number }}</td>
+                <td>{{ molding.good_molding }}</td>
+                <td>{{ molding.bad_molding }}</td>
+                <td>{{ molding.user.username }}</td>
+                <td>{{ molding.memo }}</td>
+
+                <td><td><button><a href="{% url 'product_management:staff_molding_edit' molding.id %}">編集</a></button></td></td>
+                <td><td><button><a href="{% url 'product_management:staff_molding_delete' molding.id %}">削除</a></button></td></td>
+              </tr>
+              {% endif %}
+            {% empty %}
+            <tr>
+                <td colspan="6">{{ grouped_molding_item.product__name }}.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p>{{ grouped_molding_item.product__name }}合計優良成形数: {{ grouped_molding_item.total_good_molding }}</p>
+    {% endfor %}
+</ul>
+{% endif %}
+
+<a href="{% url 'product_management:staff_home' %}">ホーム画面(staff)</a>
+
+{% endblock %}

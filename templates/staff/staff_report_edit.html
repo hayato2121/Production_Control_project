@@ -1,14 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>在庫編集</h1>
+<h1>日報編集</h1>
 <form method="POST" >
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="編集する">
 </form>
 
-<a href="{% url 'daily_report:stock_list' %}">在庫一覧に戻る</a>
-
-
+<button><a href="{% url 'product_management:staff_report_list' %}">日報一覧に戻る</a></button>
 {% endblock %}

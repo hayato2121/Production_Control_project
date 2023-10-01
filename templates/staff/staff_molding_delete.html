@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>成形品削除</h1>
+<p>成形品をを削除してもよろしいですか？</p>
+<form method="POST">
+    {% csrf_token %}
+    <p>製品名:{{ molding.product.name }}</p>
+    <p>ロッドナンバー:</p>: {{ molding.lot_number }}</p>
+    <p>成形者: {{ molding.user.username }}</p>
+    <p>優良品: {{ molding.good_molding }}</p>
+    <p>不良品: {{ molding.bad_molding }}</p>
+    <p>引き継ぎ: {{ molding.memo }}</p>
+    <p>作業日時: {{ molding.created_at.year }}/{{ molding.created_at.month }}/{{ molding.created_at.day }}</p>
+    <input type="submit" value="削除">
+</form>
+<button><a href="{% url 'product_management:staff_molding_list' %}">成形品一覧に戻る</a></button>
+{% endblock %}

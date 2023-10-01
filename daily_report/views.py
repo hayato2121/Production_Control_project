@@ -331,7 +331,7 @@ class StockEditView(LoginRequiredMixin,UpdateView):
     model = Stock
     template_name = os.path.join('stock', 'stock_edit.html')
     form_class = StockEditForm
-    success_url = reverse_lazy('daily_report:report_list')
+    success_url = reverse_lazy('daily_report:stock_list')
 
     def form_valid(self, form):
         stock_id = self.kwargs['pk']  # URLから在庫IDを取得
@@ -339,6 +339,10 @@ class StockEditView(LoginRequiredMixin,UpdateView):
         
         return super().form_valid(form)
     
+class StockDeleteView(LoginRequiredMixin,DeleteView):
+    model = Stock
+    template_name = os.path.join('stock', 'stock_delete.html')
+    success_url = reverse_lazy('daily_report:stock_list')
     
 
 #出荷編集----------------------------------------------------------------------------------------------------

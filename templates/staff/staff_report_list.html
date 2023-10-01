@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>日報確認</h1>
+
+
+<form method="GET">
+    {{ form.as_p }}
+    <button type="submit">表示</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>作業日</th>
+            <th>作業者</th>
+            <th>製品名</th>
+            <th>ロッドナンバー</th>
+            <th>優良数</th>
+            <th>不良数</th>
+            <th>作業状況</th>
+            <th>引き継ぎ</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% regroup report_data by business.name as business_reports %}
+
+        {% for business_report in business_reports %}
+        
+        <tr>
+            <td>業務内容:{{ business_report.grouper }}</td> <!-- Display the business name as a header -->
+        </tr>
+        <td></td>
+
+        {% for report in business_report.list %}
+            <tr>
+                <td>{{ report.created_at }} ,</td>
+                <td>{{ report.user.username }} ,</td>
+                <td>{{ report.product.name }} ,</td>
+                <td>{{ report.lot_number }} ,</td>
+                <td>{{ report.good_product }} ,</td>
+                <td>{{ report.bad_product }} ,</td>
+                <td>{{ report.status }} ,</td>
+                <td>{{ report.memo }}</td>
+
+                <td><button><a href="{% url 'product_management:staff_report_edit' report.id %}">編集する</a></button></td>
+                <td><button><a href="{% url 'product_management:staff_report_delete' report.id %}">削除する</a></button></td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">日報がありません.</td>
+            </tr>
+        {% endfor %}
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
+
+
+{% endblock %}

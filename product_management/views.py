@@ -1,9 +1,10 @@
 from typing import Any
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views import View
 
 from accounts.models import Users
 from daily_report.models import Report, Products
+from .models import Molding
 
 from django.contrib.auth.decorators import login_required
 
@@ -11,13 +12,12 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import (
     UpdateView, DeleteView, CreateView
 )
+from django.views.generic.list import ListView
 from datetime import datetime
-from .forms import StaffProductCreateForm, StaffBusinessCreateForm
+from .forms import StaffProductCreateForm, StaffBusinessCreateForm, GraphYearMonthForm, StaffReportEditForm, StaffMoldingEditForm,StaffUserEditForm
 from django.urls import reverse_lazy
 
 from django.views import View
-
-from .forms import GraphYearMonthForm
 
 import os
 
@@ -139,12 +139,32 @@ class StaffReportUserGraphView(View):
                     'total_bad_product': 0
                 }
 
+
             # クエリの結果を整理
             for entry in report_data:
                 username = entry.user.username
                 product_name = entry.product.name
                 good_product = entry.good_product or 0
                 bad_product = entry.bad_product or 0
+                department = entry.user.department.name
+
+
+                if username not in user_product_data:
+                    user_product_data[username] = {
+                        'products': {},
+                        'total_good_product': 0,
+                        'total_bad_product': 0,
+                        'department': department  # ユーザーの部署情報を最初に追加
+                    }
+
+                if 'department' not in user_product_data[username]:
+                    user_product_data[username]['department'] = department  # ユーザーの部署情報を最初に追加
+
+                # ユーザーの部署が変更された場合に、新しい部署情報にアップデート
+                if user_product_data[username]['department'] != department:
+                    user_product_data[username]['products'] = {}  # プロダクト情報をリセット
+                    user_product_data[username]['department'] = department
+
 
                 if product_name not in user_product_data[username]['products']:
                     user_product_data[username]['products'][product_name] = {
@@ -308,4 +328,119 @@ class StaffBusinessCreateView(CreateView):
         form.instance.create_at = datetime.now()
         form.instance.update_at = datetime.now()
         return super(StaffBusinessCreateView, self).form_valid(form)
+    
 
+
+
+#日報表示------------------------------------------------------------------------------------------------------
+class StaffReportListView(View):
+    template_name = os.path.join('staff', 'staff_report_list.html')
+
+
+    def get(self, request, *args, **kwargs):
+
+        #月と年を入力するフォーム
+        form = GraphYearMonthForm(request.GET)
+        # フォームが送信され、バリデーションが成功した場合
+
+        report_list = []
+        if form.is_valid():
+            year = form.cleaned_data['year']
+            month = form.cleaned_data['month']
+            report_data = Report.objects.filter(created_at__year=year, created_at__month=month)
+            report_list = report_data
+
+            context = {  
+                'form': form,
+                'report_data': report_list,
+            }
+
+            return render(request, self.template_name, context)
+    
+        # フォームがバリデーションに失敗した場合
+        context = {
+            'form': form,
+            'report_data': report_list,
+        }
+        return render(request, self.template_name, context)
+
+class StaffReportEditView(UpdateView):
+    model = Report
+    template_name = os.path.join('staff', 'staff_report_edit.html')
+    form_class = StaffReportEditForm
+    success_url = reverse_lazy('daily_report:report_list')
+
+    def form_valid(self, form):
+        report_id = self.kwargs['pk']  
+        report = get_object_or_404(Report, pk=report_id)  # 在庫オブジェクトを取得
+        
+        return super().form_valid(form)
+    
+class StaffReportDeleteView(DeleteView):
+    model = Report
+    success_url = reverse_lazy('product_management:staff_report_list')
+    template_name = os.path.join('staff', 'staff_report_delete.html')
+
+
+#成形品表示------------------------------------------------------------------------------------------------------
+class StaffMoldingListView(ListView):
+    model = Molding
+    template_name = os.path.join('staff','staff_molding_list.html')
+    context_object_name = 'staffmolding'
+
+    #製品ごとの合計を計算して表示する
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        grouped_molding = Molding.objects.values('product__name').annotate(total_good_molding=Sum('good_molding'))
+
+        context['grouped_molding'] = grouped_molding
+
+        return context
+
+class StaffMoldingEditView(UpdateView):
+    model = Molding
+    template_name = os.path.join('staff','staff_molding_edit.html')
+    form_class = StaffMoldingEditForm
+
+    def form_valid(self, form):
+        molding_id = self.kwargs['pk']  
+        molding = get_object_or_404(Molding, pk=molding_id)  
+        
+        return super().form_valid(form)
+    
+class StaffMoldingDeleteView(DeleteView):
+    model = Molding
+    success_url = reverse_lazy('product_management:staff_molding_list')
+    template_name = os.path.join('staff', 'staff_molding_delete.html')
+
+
+
+#ユーザー情報をstaffが編集-----------------------------------------------------------------------------------
+class StaffUserListView(ListView):
+    model = Users
+    template_name = os.path.join('staff','staff_user_list.html')
+    context_object_name = 'users'
+
+
+
+class StaffUserEditView(UpdateView):
+    model = Users
+    template_name = os.path.join('staff','staff_user_edit.html')
+    form_class = StaffUserEditForm
+
+    def form_valid(self, form):
+        user_id = self.kwargs['pk']  
+        user = get_object_or_404(Users, pk=user_id)  
+        
+        return super().form_valid(form)
+    
+    
+class StaffUserDeleteView(DeleteView):
+    model = Users
+    success_url = reverse_lazy('product_management:staff_user_list')
+    template_name = os.path.join('staff', 'staff_user_delete.html')
+
+    
+
+    
