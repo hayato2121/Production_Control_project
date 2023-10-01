@@ -1,0 +1,60 @@
+
+[
+   
+    {
+        "model": "auth.group",
+        "pk": 1,
+        "fields": {
+            "name": "staff"
+        }
+    },
+    {
+        "model": "accounts.departments",
+        "pk": 1,
+        "fields": {
+            "name": "製造部"
+        }
+    },
+    {
+        "model": "accounts.departments",
+        "pk": 2,
+        "fields": {
+            "name": "検査部"
+        }
+    },
+    {
+        "model": "accounts.departments",
+        "pk": 3,
+        "fields": {
+            "name": "出荷部"
+        }
+    },
+    {
+        "model": "daily_report.business",
+        "pk": 1,
+        "fields": {
+            "department": 1,
+            "name": "成形",
+            "business_content": "成形作業"
+        }
+    },
+    {
+        "model": "daily_report.business",
+        "pk": 2,
+        "fields": {
+            "department": 2,
+            "name": "検査",
+            "business_content": "検査作業"
+        }
+    },
+    {
+        "model": "daily_report.business",
+        "pk": 3,
+        "fields": {
+            "department": 3,
+            "name": "出荷",
+            "business_content": "出荷作業"
+        }
+    }
+
+]
