@@ -154,7 +154,3 @@ try:
 except:
     pass
 
-#maplotlib設定
-import matplotlib
-matplotlib.use('Agg')
-matplotlib.rcParams['font.family'] = 'Arial Unicode MS'
