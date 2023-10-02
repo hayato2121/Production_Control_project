@@ -29,6 +29,7 @@ from django.db.models import Sum
 import io
 import base64
 import numpy as np
+import matplotlib.font_manager
 
 
 #ログインしているユーザーを取得する。
@@ -69,6 +70,7 @@ class StaffReportUserGraphView(View):
     template_name = os.path.join('staff', 'staff_reportusergraph.html')
 
     def get(self, request, *args, **kwargs):
+        matplotlib.font_manager._rebuild()
 
         #月と年を入力するフォーム
         form = GraphYearMonthForm(request.GET)
@@ -202,6 +204,8 @@ class StaffReportProductGraphView(View):
 
 
     def get(self, request, *args, **kwargs):
+
+        matplotlib.font_manager._rebuild()
 
         #月と年を入力するフォーム
         form = GraphYearMonthForm(request.GET)
