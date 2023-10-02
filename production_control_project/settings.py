@@ -130,6 +130,8 @@ STATICFIELS_DIR = [
     STATIC_DIR,
 ]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Default primary key field type
@@ -154,5 +156,6 @@ except:
 
 #maplotlib設定
 import matplotlib
+
 matplotlib.use('Agg')
 matplotlib.rcParams['font.family'] = 'Arial Unicode MS'
