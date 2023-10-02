@@ -154,6 +154,3 @@ try:
 except:
     pass
 
-#maplotlib設定
-import matplotlib
-matplotlib.use('Agg')
