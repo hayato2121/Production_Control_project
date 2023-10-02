@@ -29,7 +29,7 @@ SECRET_KEY = get_random_secret_key()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0,0,1','.pythonanywhere.com','hayato.pythonanywhere.com']
+ALLOWED_HOSTS = ['localhost','.pythonanywhere.com','hayato.pythonanywhere.com']
 
 
 # Application definition

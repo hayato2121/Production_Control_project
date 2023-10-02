@@ -23,7 +23,7 @@ import os
 
 import matplotlib
 matplotlib.use('Agg')
-import japanize_matplotlib #グラフを文字化けしないようにする
+#import japanize_matplotlib #グラフを文字化けしないようにする
 import matplotlib.pyplot as plt
 from django.db.models import Sum
 import io
@@ -70,7 +70,6 @@ class StaffReportUserGraphView(View):
     template_name = os.path.join('staff', 'staff_reportusergraph.html')
 
     def get(self, request, *args, **kwargs):
-        matplotlib.font_manager._rebuild()
 
         #月と年を入力するフォーム
         form = GraphYearMonthForm(request.GET)
@@ -113,11 +112,11 @@ class StaffReportUserGraphView(View):
                 plt.bar(x, product_good_data, label=product.name, bottom=bottom_data)
                 bottom_data += product_good_data
 
-            plt.xlabel('ユーザー',)
-            plt.ylabel('優良数',)
+            plt.xlabel('ユーザー',fontname = 'Arial Unicode MS')
+            plt.ylabel('優良数',fontname = 'Arial Unicode MS')
             plt.xticks(x, labels, rotation=45)
             plt.tight_layout()
-            plt.legend()
+            plt.legend(prop = {"family" : "Arial Unicode MS"})
 
             # y軸の数に合わせた横線を追加
             for y_value in range(0, 100001, 20000):  # 適切な間隔を設定してください
@@ -205,7 +204,6 @@ class StaffReportProductGraphView(View):
 
     def get(self, request, *args, **kwargs):
 
-        matplotlib.font_manager._rebuild()
 
         #月と年を入力するフォーム
         form = GraphYearMonthForm(request.GET)
@@ -252,15 +250,15 @@ class StaffReportProductGraphView(View):
 
             width = 0.35  # バーの幅を調整
 
-            plt.bar(x, product_good_data, width, align='edge', label='優良数', alpha=0.7)
+            plt.bar(x, product_good_data, width, align='edge', label='優良数', alpha=0.7 ,)
             plt.bar(x, product_bad_data, width, align='center', label='不良数', alpha=0.7)
-
-            
-            plt.xlabel('製品名',)
-            plt.ylabel('優良数',)
-            plt.xticks(x, labels, rotation=45)
+ 
+          
+            plt.xlabel('製品名',fontname = 'Arial Unicode MS')
+            plt.ylabel('優良数',fontname = 'Arial Unicode MS')
+            plt.xticks(x, labels, rotation=45,fontname ='Arial Unicode MS')
             plt.tight_layout()
-            plt.legend()
+            plt.legend(prop = {"family" : "Arial Unicode MS"})
 
             # y軸の数に合わせた横線を追加
             for y_value in range(0, 100001, 20000):  # 適切な間隔を設定してください
