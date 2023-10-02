@@ -22,8 +22,8 @@ from django.views import View
 import os
 
 import matplotlib
-import japanize_matplotlib #グラフを文字化けしないようにする
 matplotlib.use('Agg')
+import japanize_matplotlib #グラフを文字化けしないようにする
 import matplotlib.pyplot as plt
 from django.db.models import Sum
 import io
