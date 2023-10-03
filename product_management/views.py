@@ -256,7 +256,7 @@ class StaffReportProductGraphView(View):
           
             plt.xlabel('製品名',fontname = 'IPAexGothic')
             plt.ylabel('優良数',fontname = 'IPAexGothic')
-            plt.xticks(x, labels, rotation=45,fontname ='Arial Unicode MS')
+            plt.xticks(x, labels, rotation=45)
             plt.tight_layout()
             plt.legend(prop = {"family" : "IPAexGothic'"})
 
