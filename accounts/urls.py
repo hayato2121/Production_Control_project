@@ -4,7 +4,7 @@ from .views import HomeView, LoginUserView, RegistUserView, LogoutUserView,Staff
 app_name = 'accounts'
 
 urlpatterns = [
-    path('', HomeView.as_view(), name='home'),
+    path('home/', HomeView.as_view(), name='home'),
     #ログイン
     path('login_user/', LoginUserView.as_view(), name='login_user'),
     #入社登録

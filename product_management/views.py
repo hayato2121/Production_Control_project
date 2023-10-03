@@ -128,11 +128,11 @@ class StaffReportUserGraphView(View):
                 
             plt.show()
 
-            plt.xlabel('ユーザー',fontname = 'Arial Unicode MS')
-            plt.ylabel('優良数',fontname = 'Arial Unicode MS')
+            plt.xlabel('ユーザー',fontname = 'IPAexGothic')
+            plt.ylabel('優良数',fontname = 'IPAexGothic')
             plt.xticks(x, labels, rotation=45)
             plt.tight_layout()
-            plt.legend(prop = {"family" : "Arial Unicode MS"})
+            plt.legend(prop = {"family" : "IPAexGothic"})
 
             # y軸の数に合わせた横線を追加
             for y_value in range(0, 100001, 20000):  # 適切な間隔を設定してください
@@ -270,11 +270,11 @@ class StaffReportProductGraphView(View):
             plt.bar(x, product_bad_data, width, align='center', label='不良数', alpha=0.7)
  
           
-            plt.xlabel('製品名',fontname = 'Arial Unicode MS')
-            plt.ylabel('優良数',fontname = 'Arial Unicode MS')
+            plt.xlabel('製品名',fontname = 'IPAexGothic')
+            plt.ylabel('優良数',fontname = 'IPAexGothic')
             plt.xticks(x, labels, rotation=45,fontname ='Arial Unicode MS')
             plt.tight_layout()
-            plt.legend(prop = {"family" : "Arial Unicode MS"})
+            plt.legend(prop = {"family" : "IPAexGothic'"})
 
             # y軸の数に合わせた横線を追加
             for y_value in range(0, 100001, 20000):  # 適切な間隔を設定してください
