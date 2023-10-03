@@ -1,7 +1,7 @@
-{% extends "base.html" %}
+{% extends 'base_staff.html' %}
 
 {% block content %}
-<h1>成形品編集</h1>
+<h2>- 成形品編集 -</h2>
 <form method="POST" >
     {% csrf_token %}
     {{ form.as_p }}

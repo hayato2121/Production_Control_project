@@ -1,7 +1,7 @@
-{% extends 'base.html' %}
+{% extends 'base_staff.html' %}
 
 {% block content %}
-<h1>日報確認</h1>
+<h2>- 日報確認 -</h2>
 
 
 <form method="GET">
@@ -9,6 +9,9 @@
     <button type="submit">表示</button>
 </form>
 
+{% regroup report_data by business.name as business_reports %}
+
+        {% for business_report in business_reports %}
 <table>
     <thead>
         <tr>
@@ -23,10 +26,6 @@
         </tr>
     </thead>
     <tbody>
-        {% regroup report_data by business.name as business_reports %}
-
-        {% for business_report in business_reports %}
-        
         <tr>
             <td>業務内容:{{ business_report.grouper }}</td> <!-- Display the business name as a header -->
         </tr>

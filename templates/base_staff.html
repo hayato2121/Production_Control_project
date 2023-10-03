@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>{% block title %} home {% endblock title %}</title>
+</head>
+<body>
+    <table>
+        <tr>
+            <td><h2>「作業日報&生産管理」</h2></td>
+            <td><p>{{ request.user.username }}さん</p></td>
+            <td><button><a href="{% url 'product_management:staff_home' %}">ホーム画面</a></button></td>
+            <td><button><a href="{% url 'accounts:logout_user' %}">ログアウト</a></button></td>
+        </tr>
+    </table>
+    <hr>
+    <p><a href="{% url 'product_management:staff_user_list' %}">社員一覧</a></p>
+    <p><a href="{% url 'product_management:staff_report_list' %}">日報一覧</a></p>
+    <p><a href="{% url 'product_management:staff_molding_list' %}">成形品一覧</a></p>
+    <p><a href="{% url 'daily_report:stock_list' %}">在庫一覧</a></p> 
+    <p><a href="{% url 'product_management:staff_business_list' %}">業務内容作成</a></p>
+    <p><a href="{% url 'product_management:staff_product_create' %}">製造情報作成</a></p>    
+    <p><a href="{% url 'product_management:staff_reportusergraph' %}">成形者ごとの１ヶ月ごとの生産数(日報から)</a></p> 
+    <p><a href="{% url 'product_management:staff_reportproductgraph' %}">製品ごとのの１ヶ月の生産数(日報から)</a></p>         
+    <hr>  
+    {% block content %}
+    {% endblock %}
+</body>
+</html>

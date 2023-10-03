@@ -1,0 +1,14 @@
+{% extends 'base_staff.html' %}
+
+{% block content %}
+<h2>- 業務内容削除- </h2>
+<p>業務内容を削除してもよろしいですか？</p>
+<form method="POST">
+    {% csrf_token %}
+    <h3>- 業務名: {{ business.name }} -</h3>
+    <p>部署:{{ business.department.name }}</p>
+    <p>業務内容: {{ business.business_content }}</p>
+    <input type="submit" value="削除">
+</form>
+<a href="{% url 'product_management:staff_business_list' %}">リストに戻る</a>
+{% endblock %}

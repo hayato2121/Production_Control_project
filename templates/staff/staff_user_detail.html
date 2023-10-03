@@ -1,0 +1,22 @@
+{% extends 'base_staff.html' %}
+
+{% block content %}
+{% if user %}
+<h2>- 作業詳細 -</h2>
+  
+                <h3>{{ user.username }}</h3>
+                <p>生年月日:{{ user.birthday }}</p>
+                <p>緊急連絡先:{{ user.phone }}</p>
+                <p>連絡先メールアドレス:{{ user.email }}</p>
+                <p>所属部署:{{ user.department }}</p>
+
+               
+                <p><button><a href="{% url 'product_management:staff_user_delete' user.id %}">削除</a></button></p>
+                
+            </tr>
+        </tbody>
+    </table>
+{% endif %}
+    <button><a href="{% url 'product_management:staff_user_list' %}">リストに戻る</a></button>     
+
+{% endblock %}

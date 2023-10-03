@@ -3,7 +3,8 @@ from django.shortcuts import render, get_object_or_404
 from django.views import View
 
 from accounts.models import Users
-from daily_report.models import Report, Products
+from daily_report.models import Report, Products,Business
+from accounts.models import Departments
 from .models import Molding
 
 from django.contrib.auth.decorators import login_required
@@ -12,6 +13,7 @@ from django.views.generic import TemplateView
 from django.views.generic.edit import (
     UpdateView, DeleteView, CreateView
 )
+from django.views.generic import DetailView
 from django.views.generic.list import ListView
 from datetime import datetime
 from .forms import StaffProductCreateForm, StaffBusinessCreateForm, GraphYearMonthForm, StaffReportEditForm, StaffMoldingEditForm,StaffUserEditForm
@@ -258,7 +260,7 @@ class StaffReportProductGraphView(View):
             plt.ylabel('優良数',fontname = 'IPAexGothic')
             plt.xticks(x, labels, rotation=45)
             plt.tight_layout()
-            plt.legend(prop = {"family" : "IPAexGothic'"})
+            plt.legend(prop = {"family" : "IPAexGothic"})
 
             # y軸の数に合わせた横線を追加
             for y_value in range(0, 100001, 20000):  # 適切な間隔を設定してください
@@ -321,18 +323,33 @@ class StaffProductCreateView(CreateView):
 
 
 #業務内容作成------------------------------------------------------------------------------------------------------
+class StaffBusinessListView(ListView):
+    model = Business
+    template_name = os.path.join('staff','staff_business_list.html')
+    context_object_name = 'businesslist'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['business_data'] = Business.objects.all() 
+        context['department_data'] = Departments.objects.all()
+        return context
+
 class StaffBusinessCreateView(CreateView):
     template_name = os.path.join('staff', 'staff_business_create.html')
     form_class = StaffBusinessCreateForm
-    success_url = reverse_lazy('product_management:staff_home')
+    success_url = reverse_lazy('product_management:staff_business_list')
 
     def form_valid(self, form):
         form.instance.create_at = datetime.now()
         form.instance.update_at = datetime.now()
         return super(StaffBusinessCreateView, self).form_valid(form)
     
+class StaffBusinessDeleteView(DeleteView):
+    model = Business
+    success_url = reverse_lazy('product_management:staff_business_list')
+    template_name = os.path.join('staff', 'staff_business_delete.html')
 
-
+    
 
 #日報表示------------------------------------------------------------------------------------------------------
 class StaffReportListView(View):
@@ -418,7 +435,7 @@ class StaffMoldingDeleteView(DeleteView):
 
 
 
-#ユーザー情報をstaffが編集-----------------------------------------------------------------------------------
+#ユーザー情報-----------------------------------------------------------------------------------
 class StaffUserListView(ListView):
     model = Users
     template_name = os.path.join('staff','staff_user_list.html')
@@ -426,17 +443,13 @@ class StaffUserListView(ListView):
 
 
 
-class StaffUserEditView(UpdateView):
+class StaffUserDetailView(DetailView):
     model = Users
-    template_name = os.path.join('staff','staff_user_edit.html')
-    form_class = StaffUserEditForm
+    template_name = os.path.join('staff','staff_user_detail.html')
+    context_object_name = 'user'
 
-    def form_valid(self, form):
-        user_id = self.kwargs['pk']  
-        user = get_object_or_404(Users, pk=user_id)  
-        
-        return super().form_valid(form)
-    
+    def get_queryset(self):
+        return Users.objects.all()
     
 class StaffUserDeleteView(DeleteView):
     model = Users

@@ -1,0 +1,36 @@
+{% extends 'base_staff.html' %}
+
+{% block content %}
+<h2>- 業務内容リスト -</h2>
+<button><a href="{% url 'product_management:staff_business_create' %}">業務を作成する</a></button>
+{% for department in department_data %}
+    <h3>部署名: {{ department.name }}</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>業務名</th>
+                <th></th>
+                <th>業務内容</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for business in business_data %}
+                {% if business.department == department %}
+                <tr>
+                    <td>{{ business.name }} -</td>
+                    <td></td>
+                    <td>{{ business.business_content }}</td>
+
+                    <td><button><a href="{% url 'product_management:staff_business_delete' business.id %}">削除</a></button></td>
+          
+                </tr>
+                {% endif %}
+            {% empty %}
+                <tr>
+                    <td colspan="3">該当する業務がありません.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endfor %}
+{% endblock %}
