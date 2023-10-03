@@ -1,0 +1,21 @@
+{% extends "base_staff.html" %}
+
+{% block content %}
+<h2>- 製品情報削除 -</h2>
+<p>在庫を削除してもよろしいですか？</p>
+<form method="POST">
+    {% csrf_token %}
+    <p>製品名:{{ products.name }}</p>
+    <p>製品コード:{{ products.code }}</p>
+    <p>製品取り数:{{ products.quantity }}</p>
+    <p>引き継ぎ:{{ products.memo }}</p>
+   
+    
+    
+    <input type="submit" value="削除">
+</form>
+
+<a href="{% url 'product_management:staff_product_list' %}">製品情報一覧に戻る</a>
+
+
+{% endblock %}

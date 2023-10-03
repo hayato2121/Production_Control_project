@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_staff.html" %}
 
 {% block content %}
 <h2>- 在庫編集 -</h2>
@@ -8,7 +8,7 @@
     <input type="submit" value="編集する">
 </form>
 
-<a href="{% url 'daily_report:stock_list' %}">在庫一覧に戻る</a>
+<a href="{% url 'product_management:staff_stock_list' %}">在庫一覧に戻る</a>
 
 
 {% endblock %}

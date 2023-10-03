@@ -2,6 +2,7 @@ from django import forms
 from daily_report.models import Report,Products, Business
 from product_management.models import Molding
 from accounts.models import Users, Departments
+from .models import Stock
 from django.contrib.auth.password_validation import validate_password
 
 
@@ -23,6 +24,17 @@ class GraphYearMonthForm(forms.Form):
 #製品作成フォーム
 class StaffProductCreateForm(forms.ModelForm):
 
+    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.Textarea(attrs={'style': 'width: 200px; height: 100px; white-space:nomal;'}))
+
+    class Meta:
+        model = Products
+        fields = ['name', 'code' , 'quantity', 'memo']
+
+#製品編集フォーム
+class StaffProductEditForm(forms.ModelForm):
+
+    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.Textarea(attrs={'style': 'width: 200px; height: 100px; white-space:nomal;'}))
+
     class Meta:
         model = Products
         fields = ['name', 'code' , 'quantity', 'memo']
@@ -30,6 +42,7 @@ class StaffProductCreateForm(forms.ModelForm):
 
 #業務内容作成フォーム
 class StaffBusinessCreateForm(forms.ModelForm):
+    business_content = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.Textarea(attrs={'style': 'width: 200px; height: 100px; white-space:nomal;'}))
 
     class Meta:
         model = Business
@@ -39,6 +52,8 @@ class StaffBusinessCreateForm(forms.ModelForm):
 #日報編集フォーム
 class StaffReportEditForm(forms.ModelForm):
 
+    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.Textarea(attrs={'style': 'width: 200px; height: 100px; white-space:nomal;'}))
+
     class Meta:
         model = Report
         fields = ['user','product','good_product','bad_product','status','memo']
@@ -46,6 +61,9 @@ class StaffReportEditForm(forms.ModelForm):
 
 #成形品編集フォーム
 class StaffMoldingEditForm(forms.ModelForm):
+
+    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.Textarea(attrs={'style': 'width: 200px; height: 100px; white-space:nomal;'}))
+
 
     class Meta:
         model = Molding
@@ -74,3 +92,23 @@ class StaffUserEditForm(forms.ModelForm):
         user.set_password(self.cleaned_data['password'])
         user.save()
         return user
+    
+class StaffStockEditForm(forms.ModelForm):
+
+    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.Textarea(attrs={'style': 'width: 200px; height: 100px; white-space:nomal;'}))
+
+    class Meta:
+        model = Stock
+        fields = [ 'product','lot_number',
+                  'molding_user','inspection_user',
+                  'stocks','memo']
+        
+    def __init__(self, *args, **kwargs):
+        super(StaffStockEditForm, self).__init__(*args, **kwargs)
+
+
+        for field_name in [ 'product','lot_number']:
+            self.fields[field_name].widget.attrs['readonly'] = 'readonly'
+
+        self.fields['molding_user'].queryset = Users.objects.filter(department__name='製造部')
+        self.fields['inspection_user'].queryset = Users.objects.filter(department__name='検査部')

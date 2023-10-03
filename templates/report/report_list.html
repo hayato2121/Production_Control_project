@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>所属部署:{{ user.department.name }}</h1>
+<h2>- 所属部署:{{ user.department.name }} -</h2>
 
 <!--作業一覧-->
 {% if request.user.department.name == '出荷部' %}
     {% if shippings %}
-        <p>出荷業務 (業務はこちらをお使いください)</p>
+        <h3>出荷業務 (業務はこちらをお使いください)</h3>
             <ul>
                 <table>
                     <thead>
@@ -42,7 +42,7 @@
             </ul>
     {% endif %}
     {% if reports %}
-        <P>出荷日報(出荷業務を元に自動作成)</P>
+        <p>出荷日報(出荷業務を元に自動作成)</p>
         <ul>
             <table >
                 <thead>

@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (
     StaffHomeView,StaffReportUserGraphView,StaffReportProductGraphView,
     StaffBusinessListView,StaffBusinessCreateView,StaffBusinessDeleteView,
-    StaffProductCreateView,
+    StaffProductCreateView,StaffProductListView,StaffProductEditView,StaffProductDeleteView,
+    StaffStockListView,StaffStockEditView,StaffStockDeleteView,
     StaffReportListView, StaffReportEditView, StaffReportDeleteView,
     StaffMoldingListView, StaffMoldingEditView, StaffMoldingDeleteView,
     StaffUserListView,StaffUserDetailView,StaffUserDeleteView
@@ -18,7 +19,14 @@ urlpatterns = [
   path('staff_business_create/',StaffBusinessCreateView.as_view(), name='staff_business_create'),
   path('staff_business_delete/<int:pk>/',StaffBusinessDeleteView.as_view(), name='staff_business_delete'),
 
+  path('staff_stock_list/', StaffStockListView.as_view(), name='staff_stock_list'),
+  path('staff_stock/<int:pk>/edit/', StaffStockEditView.as_view(), name='staff_stock_edit'),
+  path('staff_stock_delete/<int:pk>/', StaffStockDeleteView.as_view(), name='staff_stock_delete'),
+
+  path('staff_product_list/',StaffProductListView.as_view(), name='staff_product_list'),
   path('staff_product_create/', StaffProductCreateView.as_view(), name='staff_product_create'),
+  path('staff_product/<int:pk>/edit/', StaffProductEditView.as_view(), name='staff_product_edit'),
+  path('staff_product_delete/<int:pk>/', StaffProductDeleteView.as_view(), name='staff_product_delete'),
 
   path('staff_report_list/', StaffReportListView.as_view(), name='staff_report_list'),
   path('staff_report/<int:pk>/edit/', StaffReportEditView.as_view(), name='staff_report_edit'),

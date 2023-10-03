@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_staff.html' %}
 
 {% block content %}
 
@@ -23,7 +23,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for stock in stocks %}
+            {% for stock in staffstocks %}
               {% if stock.product.name == grouped_stock.product__name %}
               <tr>
                 <td>{{ stock.product.name }}</td>
@@ -40,8 +40,8 @@
                 <td>{{ report.bad_product }}</td>
                 {% endif %}
 
-                <td><button><a href="{% url 'daily_report:stock_edit' stock.id %}">編集</a></button></td>
-                <td><button><a href="{% url 'daily_report:stock_delete' stock.id %}">削除</a></button></td>
+                <td><button><a href="{% url 'product_management:staff_stock_edit' stock.id %}">編集</a></button></td>
+                <td><button><a href="{% url 'product_management:staff_stock_delete' stock.id %}">削除</a></button></td>
                 
               </tr>
               {% endif %}
@@ -52,11 +52,7 @@
     {% endfor %}
 </ul>
 {% endif %}
-
-{% if request.user.is_staff %}
 <a href="{% url 'product_management:staff_home' %}">ホーム画面(staff)</a>
-{% else %}
-<a href="{% url 'daily_report:report_list' %}">ホーム画面</a>
-{% endif %}
+
 
 {% endblock %}

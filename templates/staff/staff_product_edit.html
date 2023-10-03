@@ -1,12 +1,13 @@
-{% extends 'base_staff.html' %}
+{% extends "base_staff.html" %}
 
 {% block content %}
-<h2>- 製品情報入力 -</h2>
-<form method="POST">
+<h2>- 製品情報編集 -</h2>
+<form method="POST" >
     {% csrf_token %}
     {{ form.as_p }}
-    <input  type="submit" value="入力">
+    <input type="submit" value="編集する">
 </form>
 
 <a href="{% url 'product_management:staff_product_list' %}">製品情報一覧に戻る</a>
+
 {% endblock %}

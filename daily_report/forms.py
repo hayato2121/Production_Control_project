@@ -258,8 +258,8 @@ class ReportEndEditForm(forms.ModelForm):
 
 class ReportShippingEndEditForm(forms.ModelForm):
     
-    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.TextInput(attrs={'style': 'width: 200px; height: 100px;'}))
-    
+    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.Textarea(attrs={'style': 'width: 200px; height: 100px; white-space:nomal;'}))
+
     class Meta:
         model = Shipping
         fields = ['product','user','delivery','shipping_day','shipments_required',
@@ -296,6 +296,7 @@ class ReportShippingEndEditForm(forms.ModelForm):
 #-------------------------------------------------------------------------------------------------
 
 class StockEditForm(forms.ModelForm):
+    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.Textarea(attrs={'style': 'width: 200px; height: 100px; white-space:nomal;'}))
 
     class Meta:
         model = Stock
@@ -318,7 +319,7 @@ class StockEditForm(forms.ModelForm):
 class ShippingEndForm(forms.ModelForm):
     product = forms.CharField(label='製品名')
     delivery = forms.CharField(label='納品先')
-    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.TextInput(attrs={'style': 'width: 200px; height: 100px;'}))
+    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.Textarea(attrs={'style': 'width: 200px; height: 100px; white-space:nomal;'}))
     sets1 = forms.IntegerField(label='在庫使用1',required = False)
     sets2 = forms.IntegerField(label='在庫使用2',required = False)
     sets3 = forms.IntegerField(label='在庫使用3',required = False)

@@ -5,7 +5,7 @@ from django.views import View
 from accounts.models import Users
 from daily_report.models import Report, Products,Business
 from accounts.models import Departments
-from .models import Molding
+from .models import Molding, Stock
 
 from django.contrib.auth.decorators import login_required
 
@@ -16,7 +16,11 @@ from django.views.generic.edit import (
 from django.views.generic import DetailView
 from django.views.generic.list import ListView
 from datetime import datetime
-from .forms import StaffProductCreateForm, StaffBusinessCreateForm, GraphYearMonthForm, StaffReportEditForm, StaffMoldingEditForm,StaffUserEditForm
+from .forms import (
+    StaffProductCreateForm, StaffBusinessCreateForm, 
+    GraphYearMonthForm, StaffReportEditForm, StaffMoldingEditForm,
+    StaffStockEditForm,StaffProductEditForm
+)
 from django.urls import reverse_lazy
 
 from django.views import View
@@ -311,6 +315,24 @@ class StaffReportProductGraphView(View):
     
 
 #製品情報入力------------------------------------------------------------------------------------------------------
+class StaffProductListView(ListView):
+    model = Products
+    template_name = os.path.join('staff','staff_product_list.html')
+    context_object_name = 'products'
+
+
+class StaffProductEditView(UpdateView):
+    model = Products
+    template_name = os.path.join('staff', 'staff_product_edit.html')
+    form_class = StaffProductEditForm
+    success_url = reverse_lazy('product_management:staff_product_list')
+
+    def form_valid(self, form):
+        product_id = self.kwargs['pk']  
+        product = get_object_or_404(Products, pk=product_id)  # 在庫オブジェクトを取得
+        
+        return super().form_valid(form)
+
 class StaffProductCreateView(CreateView):
     template_name = os.path.join('staff', 'staff_product_create.html')
     form_class = StaffProductCreateForm
@@ -320,6 +342,11 @@ class StaffProductCreateView(CreateView):
         form.instance.create_at = datetime.now()
         form.instance.update_at = datetime.now()
         return super(StaffProductCreateView, self).form_valid(form)
+    
+class StaffProductDeleteView(DeleteView):
+    model = Products
+    success_url = reverse_lazy('product_management:staff_product_list')
+    template_name = os.path.join('staff', 'staff_product_delete.html')
 
 
 #業務内容作成------------------------------------------------------------------------------------------------------
@@ -333,6 +360,8 @@ class StaffBusinessListView(ListView):
         context['business_data'] = Business.objects.all() 
         context['department_data'] = Departments.objects.all()
         return context
+    
+
 
 class StaffBusinessCreateView(CreateView):
     template_name = os.path.join('staff', 'staff_business_create.html')
@@ -455,6 +484,42 @@ class StaffUserDeleteView(DeleteView):
     model = Users
     success_url = reverse_lazy('product_management:staff_user_list')
     template_name = os.path.join('staff', 'staff_user_delete.html')
+
+
+#在庫編集----------------------------------------------------------------------------------------------------------------------------------------------------------
+class StaffStockListView(ListView):
+    model = Stock
+    template_name = os.path.join('staff', 'staff_stock_list.html')
+    context_object_name = 'staffstocks'
+
+    #製品ごとの合計を計算して表示する
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        grouped_stocks = Stock.objects.values('product__name').annotate(total_stocks=Sum('stocks'))
+
+        context['grouped_stocks'] = grouped_stocks
+        return context
+
+
+class StaffStockEditView(UpdateView):
+    model = Stock
+    template_name = os.path.join('staff', 'staff_stock_edit.html')
+    form_class = StaffStockEditForm
+    success_url = reverse_lazy('product_management:staff_stock_list')
+
+    def form_valid(self, form):
+        stock_id = self.kwargs['pk']  # URLから在庫IDを取得
+        stock = get_object_or_404(Stock, pk=stock_id)  # 在庫オブジェクトを取得
+        
+        return super().form_valid(form)
+    
+    
+class StaffStockDeleteView(DeleteView):
+    model = Stock
+    template_name = os.path.join('staff', 'staff_stock_delete.html')
+    success_url = reverse_lazy('product_management:staff_stock_list')
+    
 
     
 

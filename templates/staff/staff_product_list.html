@@ -1,0 +1,38 @@
+{% extends 'base_staff.html' %}
+
+{% block content %}
+
+<!--ユーザー一覧-->
+<h2>- 製品情報 -</h2>
+
+<button><a href="{% url 'product_management:staff_product_create' %}">製品情報を入力する</a></button>
+{% if products %}
+<ul>
+        <table>
+            <thead>
+                <tr>
+                    <th>製品名</th>
+                    <th>製品コード</th>
+                    <th>製品取り数</th>
+                    <th>引き継ぎ</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.code }}</td>
+                    <td>{{ product.quantity }}</td>
+                    <td>{{ product.memo }}</td>
+                    <td><button><a href="{% url 'product_management:staff_product_edit' product.id %}">編集</a></button></td>
+                    <td><button><a href="{% url 'product_management:staff_product_delete' product.id %}">削除</a></button></td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+</ul>
+{% endif %}
+
+<a href="{% url 'product_management:staff_home' %}">ホーム画面</a>
+{% endblock %}
