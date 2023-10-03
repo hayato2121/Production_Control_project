@@ -333,11 +333,6 @@ class StockEditView(LoginRequiredMixin,UpdateView):
     form_class = StockEditForm
     success_url = reverse_lazy('daily_report:stock_list')
 
-    def form_valid(self, form):
-        stock_id = self.kwargs['pk']  # URLから在庫IDを取得
-        stock = get_object_or_404(Stock, pk=stock_id)  # 在庫オブジェクトを取得
-        
-        return super().form_valid(form)
     
 class StockDeleteView(LoginRequiredMixin,DeleteView):
     model = Stock
@@ -391,9 +386,6 @@ class ShippingDetailView(LoginRequiredMixin,DetailView):
     model = Shipping
     template_name = os.path.join('shipping', 'shipping_detail.html')
     context_object_name = 'shippingdetail'
-
-    def get_queryset(self):
-        return Shipping.objects.all()
             
 class ShippingDeleteView(LoginRequiredMixin,DeleteView):
     model = Shipping

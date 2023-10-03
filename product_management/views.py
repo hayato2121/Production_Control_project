@@ -23,6 +23,8 @@ from .forms import (
 )
 from django.urls import reverse_lazy
 
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from django.views import View
 
 import os
@@ -47,7 +49,7 @@ def employee_attendance(request):
     return render(request, 'staff_home.html', {'logged_in_user': login_user, 'attendance_info': attendance_info})
 
 #上で取得したユーザー情報をリストとして表示する。
-class StaffHomeView(TemplateView):
+class StaffHomeView(LoginRequiredMixin,TemplateView):
     model = Users
     template_name = os.path.join('staff', 'staff_home.html')
     context_object_name = 'users'
@@ -72,7 +74,7 @@ class StaffHomeView(TemplateView):
 
 
 #日報の集計グラフ------------------------------------------------------------------------
-class StaffReportUserGraphView(View):
+class StaffReportUserGraphView(LoginRequiredMixin,View):
     template_name = os.path.join('staff', 'staff_reportusergraph.html')
 
     def get(self, request, *args, **kwargs):
@@ -204,7 +206,7 @@ class StaffReportUserGraphView(View):
 
 
 #製品ごとの成形数------------------------------------------------------------------------------------------------------
-class StaffReportProductGraphView(View):
+class StaffReportProductGraphView(LoginRequiredMixin,View):
     template_name = os.path.join('staff', 'staff_reportproductgraph.html')
 
 
@@ -315,25 +317,19 @@ class StaffReportProductGraphView(View):
     
 
 #製品情報入力------------------------------------------------------------------------------------------------------
-class StaffProductListView(ListView):
+class StaffProductListView(LoginRequiredMixin,ListView):
     model = Products
     template_name = os.path.join('staff','staff_product_list.html')
     context_object_name = 'products'
 
 
-class StaffProductEditView(UpdateView):
+class StaffProductEditView(LoginRequiredMixin,UpdateView):
     model = Products
     template_name = os.path.join('staff', 'staff_product_edit.html')
     form_class = StaffProductEditForm
     success_url = reverse_lazy('product_management:staff_product_list')
 
-    def form_valid(self, form):
-        product_id = self.kwargs['pk']  
-        product = get_object_or_404(Products, pk=product_id)  # 在庫オブジェクトを取得
-        
-        return super().form_valid(form)
-
-class StaffProductCreateView(CreateView):
+class StaffProductCreateView(LoginRequiredMixin,CreateView):
     template_name = os.path.join('staff', 'staff_product_create.html')
     form_class = StaffProductCreateForm
     success_url = reverse_lazy('product_management:staff_home')
@@ -343,14 +339,14 @@ class StaffProductCreateView(CreateView):
         form.instance.update_at = datetime.now()
         return super(StaffProductCreateView, self).form_valid(form)
     
-class StaffProductDeleteView(DeleteView):
+class StaffProductDeleteView(LoginRequiredMixin,DeleteView):
     model = Products
     success_url = reverse_lazy('product_management:staff_product_list')
     template_name = os.path.join('staff', 'staff_product_delete.html')
 
 
 #業務内容作成------------------------------------------------------------------------------------------------------
-class StaffBusinessListView(ListView):
+class StaffBusinessListView(LoginRequiredMixin,ListView):
     model = Business
     template_name = os.path.join('staff','staff_business_list.html')
     context_object_name = 'businesslist'
@@ -363,7 +359,7 @@ class StaffBusinessListView(ListView):
     
 
 
-class StaffBusinessCreateView(CreateView):
+class StaffBusinessCreateView(LoginRequiredMixin,CreateView):
     template_name = os.path.join('staff', 'staff_business_create.html')
     form_class = StaffBusinessCreateForm
     success_url = reverse_lazy('product_management:staff_business_list')
@@ -373,7 +369,7 @@ class StaffBusinessCreateView(CreateView):
         form.instance.update_at = datetime.now()
         return super(StaffBusinessCreateView, self).form_valid(form)
     
-class StaffBusinessDeleteView(DeleteView):
+class StaffBusinessDeleteView(LoginRequiredMixin,DeleteView):
     model = Business
     success_url = reverse_lazy('product_management:staff_business_list')
     template_name = os.path.join('staff', 'staff_business_delete.html')
@@ -381,7 +377,7 @@ class StaffBusinessDeleteView(DeleteView):
     
 
 #日報表示------------------------------------------------------------------------------------------------------
-class StaffReportListView(View):
+class StaffReportListView(LoginRequiredMixin,View):
     template_name = os.path.join('staff', 'staff_report_list.html')
 
 
@@ -412,26 +408,21 @@ class StaffReportListView(View):
         }
         return render(request, self.template_name, context)
 
-class StaffReportEditView(UpdateView):
+class StaffReportEditView(LoginRequiredMixin,UpdateView):
     model = Report
     template_name = os.path.join('staff', 'staff_report_edit.html')
     form_class = StaffReportEditForm
     success_url = reverse_lazy('daily_report:report_list')
 
-    def form_valid(self, form):
-        report_id = self.kwargs['pk']  
-        report = get_object_or_404(Report, pk=report_id)  # 在庫オブジェクトを取得
-        
-        return super().form_valid(form)
     
-class StaffReportDeleteView(DeleteView):
+class StaffReportDeleteView(LoginRequiredMixin,DeleteView):
     model = Report
     success_url = reverse_lazy('product_management:staff_report_list')
     template_name = os.path.join('staff', 'staff_report_delete.html')
 
 
 #成形品表示------------------------------------------------------------------------------------------------------
-class StaffMoldingListView(ListView):
+class StaffMoldingListView(LoginRequiredMixin,ListView):
     model = Molding
     template_name = os.path.join('staff','staff_molding_list.html')
     context_object_name = 'staffmolding'
@@ -446,18 +437,13 @@ class StaffMoldingListView(ListView):
 
         return context
 
-class StaffMoldingEditView(UpdateView):
+class StaffMoldingEditView(LoginRequiredMixin,UpdateView):
     model = Molding
     template_name = os.path.join('staff','staff_molding_edit.html')
     form_class = StaffMoldingEditForm
 
-    def form_valid(self, form):
-        molding_id = self.kwargs['pk']  
-        molding = get_object_or_404(Molding, pk=molding_id)  
-        
-        return super().form_valid(form)
     
-class StaffMoldingDeleteView(DeleteView):
+class StaffMoldingDeleteView(LoginRequiredMixin,DeleteView):
     model = Molding
     success_url = reverse_lazy('product_management:staff_molding_list')
     template_name = os.path.join('staff', 'staff_molding_delete.html')
@@ -465,29 +451,27 @@ class StaffMoldingDeleteView(DeleteView):
 
 
 #ユーザー情報-----------------------------------------------------------------------------------
-class StaffUserListView(ListView):
+class StaffUserListView(LoginRequiredMixin,ListView):
     model = Users
     template_name = os.path.join('staff','staff_user_list.html')
     context_object_name = 'users'
 
 
 
-class StaffUserDetailView(DetailView):
+class StaffUserDetailView(LoginRequiredMixin,DetailView):
     model = Users
     template_name = os.path.join('staff','staff_user_detail.html')
     context_object_name = 'user'
 
-    def get_queryset(self):
-        return Users.objects.all()
-    
-class StaffUserDeleteView(DeleteView):
+
+class StaffUserDeleteView(LoginRequiredMixin,DeleteView):
     model = Users
     success_url = reverse_lazy('product_management:staff_user_list')
     template_name = os.path.join('staff', 'staff_user_delete.html')
 
 
 #在庫編集----------------------------------------------------------------------------------------------------------------------------------------------------------
-class StaffStockListView(ListView):
+class StaffStockListView(LoginRequiredMixin,ListView):
     model = Stock
     template_name = os.path.join('staff', 'staff_stock_list.html')
     context_object_name = 'staffstocks'
@@ -502,20 +486,15 @@ class StaffStockListView(ListView):
         return context
 
 
-class StaffStockEditView(UpdateView):
+class StaffStockEditView(LoginRequiredMixin,UpdateView):
     model = Stock
     template_name = os.path.join('staff', 'staff_stock_edit.html')
     form_class = StaffStockEditForm
     success_url = reverse_lazy('product_management:staff_stock_list')
 
-    def form_valid(self, form):
-        stock_id = self.kwargs['pk']  # URLから在庫IDを取得
-        stock = get_object_or_404(Stock, pk=stock_id)  # 在庫オブジェクトを取得
-        
-        return super().form_valid(form)
     
     
-class StaffStockDeleteView(DeleteView):
+class StaffStockDeleteView(LoginRequiredMixin,DeleteView):
     model = Stock
     template_name = os.path.join('staff', 'staff_stock_delete.html')
     success_url = reverse_lazy('product_management:staff_stock_list')

@@ -4,6 +4,8 @@ from django.contrib.auth.password_validation import validate_password
 
 from django.contrib.auth.forms import AuthenticationForm
 
+from django.contrib.auth.hashers import make_password
+
 #ログイン
 class LoginUserForm(AuthenticationForm):
     username = forms.CharField(label='名前')
@@ -54,4 +56,35 @@ class StaffUserForm(RegistUserForm):
         user.set_password(self.cleaned_data['password'])
         user.save()
         return user
+    
 
+#ユーザー編集画面
+class ProfileEditForm(forms.ModelForm):
+    password = forms.CharField(label='パスワード', widget=forms.PasswordInput, required=False)
+    password_confirm = forms.CharField(label='パスワード（確認）', widget=forms.PasswordInput, required=False)
+
+    class Meta:
+        model = Users
+        fields = ('username', 'email', 'phone', 'department')
+
+    def clean_password_confirm(self):
+        password = self.cleaned_data.get('password')
+        password_confirm = self.cleaned_data.get('password_confirm')
+
+        # 新しいパスワードと確認用パスワードが一致しない場合、エラーメッセージを表示
+        if password and password_confirm and password != password_confirm:
+            raise forms.ValidationError('パスワードと確認用パスワードが一致しません。')
+        
+        return password_confirm
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        password = self.cleaned_data.get('password')
+        
+        if password:
+            user.password = make_password(password)
+
+        if commit:
+            user.save()
+        
+        return user

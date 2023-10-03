@@ -1,15 +1,26 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.views.generic.edit import CreateView
 from django.views.generic.base import TemplateView
 # Create your views here.
 
 from django.contrib.auth.views import LoginView, LogoutView
 
+from django.views.generic.list import ListView
+from django.views.generic.edit import (
+    UpdateView, DeleteView, CreateView
+)
+from .forms import ProfileEditForm
+from .models import Users
+
+import os
+from django.views import View
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 from .forms import LoginUserForm, RegistUserForm, StaffUserForm
 
 from django.urls import reverse_lazy
 
-from django.contrib.auth import login
 
 
 class HomeView(TemplateView):
@@ -52,11 +63,28 @@ class StaffUserView(CreateView):
         user.is_staff = form.cleaned_data['is_staff'] 
         user.save()
         return super().form_valid(form)
+
+#ユーザー詳細画面
+class ProfileView(LoginRequiredMixin,TemplateView):
+    template_name = os.path.join('user', 'profile.html')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user'] = self.request.user
+        return context
     
+#ユーザー編集画面
+class ProfileEditView(LoginRequiredMixin,UpdateView):
+    model = Users
+    form_class = ProfileEditForm
+    template_name = os.path.join('user', 'profile_edit.html')
+    success_url = reverse_lazy('accounts:profile')
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
 
 #ログアウト
 class LogoutUserView(LogoutView):
     pass
 
-
-  
