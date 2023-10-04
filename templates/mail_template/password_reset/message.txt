@@ -3,6 +3,6 @@
 下記URLよりサイトにアクセスの上、パスワードの再設定を行ってください。
 
 再設定用URL
-{% url 'accounts:password_reset_confirm' uid token %}
+{% url 'accounts:password_reset_confirm' uidb64=uid token=token %}
 
 生産管理アプリ

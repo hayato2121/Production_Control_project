@@ -103,7 +103,7 @@ class PasswordResetView(PasswordResetView):
     success_url = reverse_lazy('accounts:login_user')
 
     def form_valid(self, form):
-        messages.success(self.request, 'パスワード再設定用のメールを送信しました。<br> メールに記載されているリンクから再設定を行ってください。')
+        messages.success(self.request, 'パスワード再設定用のメールを送信しました。メールに記載されているリンクから再設定を行ってください。')
         return super().form_valid(form)
 
 class PasswordResetConfirmView(PasswordResetConfirmView):
