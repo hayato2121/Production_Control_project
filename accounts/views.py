@@ -3,7 +3,7 @@ from django.views.generic.edit import CreateView
 from django.views.generic.base import TemplateView
 # Create your views here.
 
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth.views import LoginView, LogoutView, PasswordChangeView,PasswordResetView,PasswordResetConfirmView
 
 from django.views.generic.list import ListView
 from django.views.generic.edit import (
@@ -17,7 +17,8 @@ from django.views import View
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from .forms import LoginUserForm, RegistUserForm, StaffUserForm
+from django.contrib import messages
+from .forms import LoginUserForm, RegistUserForm, StaffUserForm, PasswordChangeForm,PasswordResetForm,SetPasswordForm
 
 from django.urls import reverse_lazy
 
@@ -82,6 +83,39 @@ class ProfileEditView(LoginRequiredMixin,UpdateView):
 
     def get_object(self, queryset=None):
         return self.request.user
+    
+#パスワード変更画面
+class PasswordChangeView(PasswordChangeView):
+    form_class = PasswordChangeForm
+    template_name = os.path.join('user','user_password_change.html')
+    success_url = reverse_lazy('accounts:login_user')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'パスワードが正常に変更されました。再度ログインしてください。')
+        return super().form_valid(form)
+    
+#パスワードリセット
+class PasswordResetView(PasswordResetView):
+    subject_template_name = 'mail_template/password_reset/subject.txt'
+    email_template_name = 'mail_template/password_reset/message.txt'
+    template_name = os.path.join('user', 'user_password_reset.html')
+    form_class = PasswordResetForm
+    success_url = reverse_lazy('accounts:login_user')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'パスワード再設定用のメールを送信しました。<br> メールに記載されているリンクから再設定を行ってください。')
+        return super().form_valid(form)
+
+class PasswordResetConfirmView(PasswordResetConfirmView):
+    
+    form_class = SetPasswordForm
+    success_url = reverse_lazy('accounts:login_user')
+    template_name = os.path.join('user', 'password_reset_confirm.html')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'パスワード再設定を完了しました')
+        return super().form_valid(form)
+
 
 
 #ログアウト

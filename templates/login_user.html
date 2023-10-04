@@ -10,11 +10,22 @@
     <h1>株式会社</h1>
     <h2>- 生産管理アプリ -</h2>
     <p>ログイン画面</p>
+
+    <!--パスワード変更されたらメッセージを表示する-->
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    
     <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
         <input  type="submit" value="ログイン">
     </form>
+    <p><button><a href="{% url 'accounts:password_reset' %}">パスワードを忘れた方</a></button></p>
 
     <a href="{% url 'accounts:home' %}">メインページに戻る</a>
 </body>

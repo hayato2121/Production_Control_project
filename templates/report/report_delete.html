@@ -11,5 +11,5 @@
     <p>作業日時: {{ report.created_at.year }}/{{ report.created_at.month }}/{{ report.created_at.day }}</p>
     <input type="submit" value="削除">
 </form>
-<button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>
+<p><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></p>
 {% endblock %}

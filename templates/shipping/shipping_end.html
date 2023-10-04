@@ -2,6 +2,7 @@
 
 {% block content %}
 <h2>- 作業終了 -</h2>
+<h3>出荷に必要な在庫のロッド番号を選んで数を記入してください。</h3>
 <form method="POST">
     {% csrf_token %}
     <div>
@@ -64,5 +65,5 @@
     {{ forms.errors }}
     <input type="submit" value="終了する">
 </form>
-<button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>
+<p><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></p>
 {% endblock %}

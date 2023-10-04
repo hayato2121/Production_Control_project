@@ -29,7 +29,7 @@
                     <td>{{ report.business.name }}</td>
                     <td>{{ report.user.username }}</td>
                     <td>{{ report.lot_number }}</td>
-                    <td>{{ report.status }}</td>
+                    <td><strong>{{ report.status }}</strong></td>
                     <td>{{ report.good_product }}</td>
                     <td>{{ report.bad_product }}</td>
                     <td>{{ report.memo }}</td>
@@ -41,6 +41,9 @@
     {% endif %}
 
 <p>本日の作業を終了しますか？</p>
+
+<p><strong>※実行中の作業を終了してからログアウトすることをお勧めします。一日経つとデータを編集できなくなります。※</strong></p>
+
 <button><a href="{% url 'accounts:logout_user' %}">ログアウトします</a></button>
 <button><a href="{% url 'daily_report:report_list' %}">ログアウトしません(ホームに戻る)</a></button>
 

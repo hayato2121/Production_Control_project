@@ -2,11 +2,10 @@
 
 {% block content %}
 <h2>- 所属部署:{{ user.department.name }} -</h2>
-
 <!--作業一覧-->
 {% if request.user.department.name == '出荷部' %}
     {% if shippings %}
-        <h3>出荷業務 (業務はこちらをお使いください)</h3>
+        <h3>出荷業務</h3>
             <ul>
                 <table>
                     <thead>
@@ -28,58 +27,22 @@
                                 <td>{{ shipping.shipments_required }}</td>
                                 <td>{{ shipping.memo }}</td>
                                 {% if shipping.stock1 or shipping.stock2 or shipping.stock3 %}
-                                <td>終了</td>
+                                <td><strong>終了</strong></td>
+                                <td><button><a href="{% url 'daily_report:shipping_detail' pk=shipping.id %}">結果を編集する</a></button></td>
                                 {% else %}
-                                <td>実行中</td>
+                                <td><strong>実行中</strong></td>
+                                <td><button><a href="{% url 'daily_report:shipping_detail' pk=shipping.id %}">作業を終了する</a></button></td>
                                 {% endif %}
-                                <td><button><a href="{% url 'daily_report:shipping_detail' pk=shipping.id %}">詳細画面</a></button></td>
-                                <!--あとでcssを使ってモーダルウィンドウにする-->
-                                <td><button><a href="{% url 'daily_report:shipping_delate' pk=shipping.id %}">削除</a></button></td>
+                               
+                            
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-            </ul>
-    {% endif %}
-    {% if reports %}
-        <p>出荷日報(出荷業務を元に自動作成)</p>
-        <ul>
-            <table >
-                <thead>
-                    <tr>
-                        <td>製品名</td>
-                        <td>製品コード</td>
-                        <td>業務内容</td>
-                        <td>作業者</td>
-                        <td>ロッド番号</td>
-                        <td>作業状況</td>
-                        <td>優良成形数</td>
-                        <td>不良成形数</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for report in reports %}
-                    <tr>
-                        <td>{{ report.product.name }}</td>
-                        <td>{{ report.product.code }}</td>
-                        <td>{{ report.business.name }}</td>
-                        <td>{{ report.user.username }}</td>
-                        <td>{{ report.lot_number }}</td>
-                        <td>{{ report.status }}</td>
 
-                        {% if report.good_product is not None %}
-                        <td>{{ report.good_product }}</td>
-                        <td>{{ report.bad_product }}</td>
-                        {% endif %}
-                        <!--あとでcssを使ってモーダルウィンドウにする-->
-                        <td><button><a href="{% url 'daily_report:report_delete' pk=report.id %}">削除</a></button></td>
-                        
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </ul>
-        <p><a href="{% url 'daily_report:stock_list' %}">在庫を修正する</a></p>
+                <h4>※出荷業務の入力間違いがあれば、必ず在庫を修正してください。</h4>
+                <button><a href="{% url 'daily_report:stock_list' %}">在庫を編集できます。</a></button>
+            </ul>
     {% endif %}
 {% else %}
     {% if reports %}
@@ -105,17 +68,20 @@
                     <td>{{ report.business.name }}</td>
                     <td>{{ report.user.username }}</td>
                     <td>{{ report.lot_number }}</td>
-                    <td>{{ report.status }}</td>
+                    <td><strong>{{ report.status }}</strong></td>
 
                     {% if report.good_product is not None %}
                     <td>{{ report.good_product }}</td>
                     <td>{{ report.bad_product }}</td>
                     {% endif %}
 
-                    <td><button><a href="{% url 'daily_report:report_detail' pk=report.id %}">詳細画面</a></button></td>
-                    <!--あとでcssを使ってモーダルウィンドウにする-->
-                    <td><button><a href="{% url 'daily_report:report_delete' pk=report.id %}">削除</a></button></td>
-                    
+                    {% if report.status == '終了' %}
+                    <td><button><a href="{% url 'daily_report:report_detail' pk=report.id %}">結果を編集する</a></button></td>
+                    {% else %}
+                    <td><button><a href="{% url 'daily_report:report_detail' pk=report.id %}">作業を終了する</a></button></td>
+                    {% endif %}
+
+                   
                 </tr>
                 {% endfor %}
             </tbody>
@@ -126,7 +92,7 @@
 
 
 {% if request.user.department.name == '製造部' %}
-    <button><a href="{% url 'daily_report:report_start' %}">作業をスタートする</a></button>
+    <button><a href="{% url 'daily_report:report_start' %}">作業をスタートする_製造</a></button>
     {% elif request.user.department.name == '検査部' %}
     <button><a href="{% url 'daily_report:report_start_inspection' %}">作業をスタートする_検査</a></button>
     {% elif request.user.department.name == '出荷部' %}

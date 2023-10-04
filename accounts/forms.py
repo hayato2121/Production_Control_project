@@ -2,7 +2,7 @@ from django import forms
 from .models import Users, Departments
 from django.contrib.auth.password_validation import validate_password
 
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm ,PasswordChangeForm,PasswordResetForm, SetPasswordForm
 
 from django.contrib.auth.hashers import make_password
 
@@ -88,3 +88,22 @@ class ProfileEditForm(forms.ModelForm):
             user.save()
         
         return user
+    
+#パスワード変更
+class PasswordChangeForm(PasswordChangeForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+
+#パスワードリセットフォーム
+class PasswordResetForm(PasswordResetForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+#パスワード再設定用フォーム
+class SetPasswordForm(SetPasswordForm):
+   
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

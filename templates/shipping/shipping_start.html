@@ -2,11 +2,12 @@
 
 {% block content %}
 <h2>- 作業開始ページ -</h2>
+<h3>出荷に必要な情報を入力してください</h3>
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="スタートする">
 </form>
 
-<button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>
+<p><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></p>
 {% endblock %}

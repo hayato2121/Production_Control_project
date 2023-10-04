@@ -14,10 +14,9 @@
     <p>使用在庫１: {{ shipping.stock1}}</p>
     <p>使用在庫２: {{ shipping.stock2 }}</p>
     <p>使用在庫３: {{ shipping.stock3 }}</p>
-    <p>使用在庫３: {{ shipping.memo }}</p>
-    
+    <p>引き継ぎ: {{ shipping.memo }}</p>
     
     <input type="submit" value="削除">
 </form>
-<button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>
+<p><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></p>
 {% endblock %}

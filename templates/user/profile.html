@@ -25,6 +25,8 @@
     </tr>
   </table>
   <p><button><a href="{% url 'accounts:profile_edit' user.pk %}">プロフィール編集</a></button></p>
+  <p><button><a href="{% url 'accounts:password_change' %}">パスワード編集</a></button></p>
+
   <a href="{% url 'daily_report:report_list' %}">ホームに戻る</a>
 {% endblock %}
 

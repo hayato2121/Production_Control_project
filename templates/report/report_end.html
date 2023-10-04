@@ -2,6 +2,7 @@
 
 {% block content %}
 <h2>- 作業終了 -</h2>
+<h3>終了後の結果を記入し、終了をしてください。</h3>
 <form method="POST">
     {% csrf_token %}
     <div>
@@ -39,5 +40,5 @@
     
     <input type="submit" value="終了する">
 </form>
-<button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>
+<p><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></p>
 {% endblock %}

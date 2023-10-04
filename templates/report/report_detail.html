@@ -28,16 +28,18 @@
     <p>{{ reportdetail.business.name }}優良数：{{ reportdetail.good_product }}</p>
     <p>{{ reportdetail.business.name }}不良数: {{ reportdetail.bad_product }}</p>
         {% if request.user.department.name != '出荷部' %}
-        <p><a href="{% url 'daily_report:report_endedit' reportdetail.id %}">結果を編集する</a></p>
+        <p><button><a href="{% url 'daily_report:report_endedit' reportdetail.id %}">結果を編集する</a></button></p>
         {% endif %}
     {% else %}
         {% if request.user.department.name == '出荷部' %}
-        <p><a href="{% url 'daily_report:report_shippingend' reportdetail.id %}">作業を終了する(出荷部)</a></p>
+        <p><button><a href="{% url 'daily_report:report_shippingend' reportdetail.id %}">作業を終了する</a></button></p>
         {% else %}
-        <p><a href="{% url 'daily_report:report_end' reportdetail.id %}">作業を終了する</a></p>
+        <p><button><a href="{% url 'daily_report:report_end' reportdetail.id %}">作業を終了する</a></button></p>
         {% endif %}
     {% endif %}
 
-    <button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>
+    <p><button><a href="{% url 'daily_report:report_delete' reportdetail.id %}">作業を削除する</a></button></p>
+
+    <p><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></p>
 
 {% endblock %}

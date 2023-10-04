@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>- 作業開始ページ(検査) -</h2>
+<h2>- 作業開始ページ -</h2>
+<h3>検査するロッド番号を選択して開始してください</h3>
 <form method="POST">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="スタートする">
 </form>
 
-<button><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></button>
+<p><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></p>
 {% endblock %}
