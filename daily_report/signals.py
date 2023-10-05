@@ -35,16 +35,18 @@ def delete_stock(sender, instance, **kwargs):
 
 # Stockが作成した時に同じlot_numberのmoldingを消す----------------------------------
 @receiver(post_save, sender=Stock)
-def update_molding(sender, instance, created, **kwargs):
+def delete_related_molding(sender, instance, created, **kwargs):
     # Stock オブジェクトが作成された場合のみ処理を実行
     if created:
         lot_number = instance.lot_number
 
         # lot_number に一致する Molding オブジェクトを取得
         molding = Molding.objects.filter(lot_number=lot_number).first()
-            
-        molding.delete()
 
+        if molding:
+            # Molding オブジェクトが存在する場合にのみ削除
+            molding.delete()
+            
 #shipping作成時に在庫が0になったら自動的に削除する----------------------------------
 @receiver(post_save, sender=Stock)
 def update_molding(sender, instance, **kwargs):
