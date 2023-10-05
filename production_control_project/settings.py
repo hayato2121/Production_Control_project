@@ -74,7 +74,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 #URL設定
-                'production_control_project.context_processors.my_custom_context',
+                'accounts.context_processors.my_custom_context',
             ],
         },
     },
