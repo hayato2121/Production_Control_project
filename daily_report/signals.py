@@ -42,12 +42,8 @@ def update_molding(sender, instance, created, **kwargs):
 
         # lot_number に一致する Molding オブジェクトを取得
         molding = Molding.objects.filter(lot_number=lot_number).first()
-
-        if molding:
-            # Molding オブジェクトを変更する必要がある場合の処理をここに記述
-            # 例えば、以下のように Molding オブジェクトを更新する
             
-            molding.delete()
+        molding.delete()
 
 #shipping作成時に在庫が0になったら自動的に削除する----------------------------------
 @receiver(post_save, sender=Stock)
