@@ -3,7 +3,7 @@
 下記URLよりサイトにアクセスの上、パスワードの再設定を行ってください。
 
 再設定用URL
-hayato21.pythonanywhere.com{% url 'accounts:password_reset_confirm' uidb64=uid token=token %}
+{{ protocol }}:// {{ domain }}{% url 'accounts:password_reset_confirm' uidb64=uid token=token %}
 
 このメールは{{ protocol }}:// {{ domain }}より自動送信しています。
 心当たりのない方はこのメールを破棄してください。
