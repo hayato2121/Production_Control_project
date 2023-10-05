@@ -5,7 +5,7 @@
 再設定用URL
 {{ protocol }}://{{ domain }}{% url 'accounts:password_reset_confirm' uidb64=uid token=token %}
 
-このメールは{{ protocol }}://{{ domain }}より自動送信しています。
+このメールは{{ protocol }}://{{ domain }} より自動送信しています。
 心当たりのない方はこのメールを破棄してください。
 
 生産管理アプリ
