@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>- 作業詳細 -</h2>
+<p>出荷日:{{ shippings.shipping_day }}<p>
+    <p>製品名:{{ shippings.product }}</p>
+    <p>納品先:{{ shippings.delivery }}</p>
+    <p>出荷担当者:{{ shippings.user }}</p>
+    <p>出荷必要数:{{ shippings.shipments_required }}</p>
+    <p>使用在庫1:{{ shippings.stock1 }}</p>
+    <p>使用在庫2:{{ shippings.stock2 }}</p>
+    <p>使用在庫3:{{ shippings.stock3 }}</p>
+    <p>引き継ぎ:{{ shippings.memo }}</p>
+    
+    <p><strong>※削除するときは、在庫の編集から在庫数を必ず戻してください</strong></p>
+    <p><button><a href="{% url 'product_management:staff_shipping_delete' shippings.id %}">削除</a></button></p>
+    <button><a href="{% url 'product_management:staff_stock_list' %}">在庫を編集</a></button>
+    
+
+    <p><a href="{% url 'product_management:staff_shipping_list' %}">出荷リストに戻る</a></p>
+
+{% endblock %}
+

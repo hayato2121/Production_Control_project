@@ -1,0 +1,48 @@
+{% extends 'base_staff.html' %}
+
+{% block content %}
+
+<!--作業一覧-->
+<h2>- 出荷リスト -</h2>
+
+
+<form method="GET">
+    {{ form.as_p }}
+    <button type="submit">表示</button>
+</form>
+{% if shipping_list %}
+    {% regroup shipping_list by delivery as grouped_shippings %}
+
+    {% for delivery_group in grouped_shippings %}
+        <h3>出荷先: {{ delivery_group.grouper }}</h3>
+        <table>
+            <thead>
+                <tr>
+                    <td>出荷日</td>
+                    <td>製品名</td>
+                    <td>出荷先</td>
+                    <td>作業担当</td>
+                    <td>出荷必要数</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for shipping in delivery_group.list %}
+                    <tr>
+                        <td>{{ shipping.shipping_day }}</td>
+                        <td>{{ shipping.product }}</td>
+                        <td>{{ shipping.delivery }}</td>
+                        <td>{{ shipping.user }}</td>
+                        <td>{{ shipping.shipments_required }}</td>
+                        <td><button><a href="{% url 'product_management:staff_shipping_detail' shipping.id %}">詳細画面</a></button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endfor %}
+
+    <a href="{% url 'product_management:staff_home' %}">ホーム画面</a>
+{% endif %}
+
+
+
+{% endblock %}

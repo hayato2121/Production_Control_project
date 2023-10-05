@@ -6,7 +6,8 @@ from .views import (
     StaffStockListView,StaffStockEditView,StaffStockDeleteView,
     StaffReportListView, StaffReportEditView, StaffReportDeleteView,
     StaffMoldingListView, StaffMoldingEditView, StaffMoldingDeleteView,
-    StaffUserListView,StaffUserDetailView,StaffUserDeleteView
+    StaffUserListView,StaffUserDetailView,StaffUserDeleteView,
+    StaffShippingListView,StaffShippingDetailView,StaffShippingDeleteView
 )
 app_name =  'product_management'
 
@@ -39,5 +40,9 @@ urlpatterns = [
   path('staff_user_list/', StaffUserListView.as_view(), name='staff_user_list'),
   path('staff_user_detail/<int:pk>/', StaffUserDetailView.as_view(), name='staff_user_detail'),
   path('staff_user_delete/<int:pk>/', StaffUserDeleteView.as_view(), name='staff_user_delete'),
+
+  path('staff_shipping_list/',StaffShippingListView.as_view(),name='staff_shipping_list'),
+  path('staff_shipping_detail/<int:pk>/',StaffShippingDetailView.as_view(),name='staff_shipping_detail'),
+  path('staff_shipping_delete/<int:pk>/',StaffShippingDeleteView.as_view(),name='staff_shipping_delete'),
 
 ]

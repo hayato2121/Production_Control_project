@@ -5,22 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="format-detection" content="telephone=no" />
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <title>{% block title %} home {% endblock title %}</title>
+    <title>{% block title %} 生産管理アプリ {% endblock title %}</title>
 </head>
 <body>
-    <table>
-        <tr>
-            <td><h2>「作業日報&生産管理」</h2></td>
-            <td><button><a href="{% url 'daily_report:report_list' %}">ホーム画面</a></button></td>
-            <td><button onclick="confirmLogout()"><a href="#">ログアウトします</a></button></td>
-            <td></td>
-            <td><h3>{{ request.user.username }}さん</h3></td>
-            <td><p><a href="{% url 'accounts:profile' %}">アカウント詳細</a></p></td>
-        </tr>
-    </table>
-    <hr>
+    {% if user.is_authenticated %}
+        <table>
+            <tr>
+                <td><h2>「作業日報&生産管理」</h2></td>
+                <td><button><a href="{% url 'daily_report:report_list' %}">ホーム画面</a></button></td>
+                <td><button onclick="confirmLogout()"><a href="#">ログアウトします</a></button></td>
+                <td></td>
+                <td><h3>{{ request.user.username }}さん</h3></td>
+                <td><p><a href="{% url 'accounts:profile' %}">アカウント詳細</a></p></td>
+            </tr>
+        </table>
+        <hr>
+    {% else %}
+        <h1>株式会社</h1>
+        <h2>- 生産管理アプリ -</h2>
+    {% endif %}
+
     {% block content %}
-    {% endblock %}x
+    {% endblock %}
 
     <script>
         function confirmLogout() {

@@ -9,9 +9,8 @@
     <button type="submit">表示</button>
 </form>
 
-{% regroup report_data by business.name as business_reports %}
-
-        {% for business_report in business_reports %}
+{% regroup report_list by business.name as business_reports %}
+{% if report_list %}
 <table>
     <thead>
         <tr>
@@ -26,6 +25,7 @@
         </tr>
     </thead>
     <tbody>
+        {% for business_report in business_reports %}
         <tr>
             <td>業務内容:{{ business_report.grouper }}</td> <!-- Display the business name as a header -->
         </tr>
@@ -33,7 +33,7 @@
 
         {% for report in business_report.list %}
             <tr>
-                <td>{{ report.created_at }} ,</td>
+                <td><strong>{{ report.created_at }} ,</strong></td>
                 <td>{{ report.user.username }} ,</td>
                 <td>{{ report.product.name }} ,</td>
                 <td>{{ report.lot_number }} ,</td>
@@ -53,6 +53,7 @@
         {% endfor %}
     </tbody>
 </table>
+{% endif %}
 
 
 

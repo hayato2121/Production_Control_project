@@ -64,7 +64,7 @@ class Stock(models.Model):
         db_table = 'stock'
 
     def __str__(self):
-        return '[' + self.created_at.strftime('%Y-%m-%d') + ']' + ':' + self.product.name + ':' + self.lot_number + ':' +'「' + '在庫数'+ '=' + str(self.stocks) + '」'
+        return '[' + self.created_at.strftime('%Y-%m-%d') + ']' + ':' + self.product.name + ':' + self.lot_number + ':' +'「' + '在庫数'+ '=' + '残り' + str(self.stocks) + '」'
 #出荷---------------------------------------------------------------
 class Shipping(models.Model):
     product = models.ForeignKey(

@@ -1,18 +1,10 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <title>{% block title %} home {% endblock title %}</title>
-</head>
-<body>
-    <h1>株式会社</h1>
-    <h2>- 生産管理アプリ -</h2>
-    <nav>
-        <p><button><a href="{% url 'accounts:login_user' %}">ログイン</a></button></p>
-        <button><a href="{% url 'accounts:regist_user' %}">入社登録</a></button>
-        <button><a href="{% url 'accounts:staff_user' %}">管理アカウント登録</a></button>
-    </nav>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block content %}
+<nav>
+    <p><button><a href="{% url 'accounts:login_user' %}">ログイン</a></button></p>
+    <button><a href="{% url 'accounts:regist_user' %}">入社登録</a></button>
+    <button><a href="{% url 'accounts:staff_user' %}">管理アカウント登録</a></button>
+</nav>
+{% endblock %}
+

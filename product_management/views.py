@@ -5,7 +5,7 @@ from django.views import View
 from accounts.models import Users
 from daily_report.models import Report, Products,Business
 from accounts.models import Departments
-from .models import Molding, Stock
+from .models import Molding, Stock,Shipping
 
 from django.contrib.auth.decorators import login_required
 
@@ -396,7 +396,7 @@ class StaffReportListView(LoginRequiredMixin,View):
 
             context = {  
                 'form': form,
-                'report_data': report_list,
+                'report_list': report_list,
             }
 
             return render(request, self.template_name, context)
@@ -404,7 +404,7 @@ class StaffReportListView(LoginRequiredMixin,View):
         # フォームがバリデーションに失敗した場合
         context = {
             'form': form,
-            'report_data': report_list,
+            'report_list': report_list,
         }
         return render(request, self.template_name, context)
 
@@ -493,13 +493,52 @@ class StaffStockEditView(LoginRequiredMixin,UpdateView):
     success_url = reverse_lazy('product_management:staff_stock_list')
 
     
-    
+
 class StaffStockDeleteView(LoginRequiredMixin,DeleteView):
     model = Stock
     template_name = os.path.join('staff', 'staff_stock_delete.html')
     success_url = reverse_lazy('product_management:staff_stock_list')
     
 
+#出荷リスト--------------------------------------------------------------------
+class StaffShippingListView(LoginRequiredMixin,View):
+    template_name = os.path.join('staff', 'staff_shipping_list.html')
+
+    def get(self, request, *args, **kwargs):
+
+        #月と年を入力するフォーム
+        form = GraphYearMonthForm(request.GET)
+        # フォームが送信され、バリデーションが成功した場合
+
+        shipping_list = []
+        if form.is_valid():
+            year = form.cleaned_data['year']
+            month = form.cleaned_data['month']
+            shipping_data = Shipping.objects.filter(shipping_day__year=year, shipping_day__month=month)
+            shipping_list = shipping_data
+
+            context = {  
+                'form': form,
+                'shipping_list': shipping_list,
+            }
+
+            return render(request, self.template_name, context)
     
+        # フォームがバリデーションに失敗した場合
+        context = {
+            'form': form,
+            'shipping_list': shipping_list,
+        }
+        return render(request, self.template_name, context)
+
+
+class StaffShippingDetailView(LoginRequiredMixin,DetailView):
+    model = Shipping
+    template_name = os.path.join('staff','staff_shipping_detail.html')
+    context_object_name = 'shippings'
 
     
+class StaffShippingDeleteView(LoginRequiredMixin,DeleteView):
+    model = Shipping
+    success_url = reverse_lazy('product_management:staff_shipping_list')
+    template_name = os.path.join('staff', 'staff_shipping_delete.html')

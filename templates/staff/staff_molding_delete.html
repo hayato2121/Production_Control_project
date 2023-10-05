@@ -2,7 +2,7 @@
 
 {% block content %}
 <h2>- 成形品削除 -</h2>
-<p>成形品をを削除してもよろしいですか？</p>
+<p><strong>成形品をを削除してもよろしいですか？</strong></p>
 <form method="POST">
     {% csrf_token %}
     <p>製品名:{{ molding.product.name }}</p>

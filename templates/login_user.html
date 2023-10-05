@@ -1,15 +1,7 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <title>{% block title %} home {% endblock title %}</title>
-</head>
-<body>
-    <h1>株式会社</h1>
-    <h2>- 生産管理アプリ -</h2>
-    <p>ログイン画面</p>
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>ログイン画面</h2>
 
     <!--パスワード変更されたらメッセージを表示する-->
     {% if messages %}
@@ -28,5 +20,4 @@
     <p><button><a href="{% url 'accounts:password_reset' %}">パスワードを忘れた方</a></button></p>
 
     <a href="{% url 'accounts:home' %}">メインページに戻る</a>
-</body>
-</html>
+{% endblock %}

@@ -2,7 +2,7 @@
 
 {% block content %}
 <h2>- 業務内容削除- </h2>
-<p>業務内容を削除してもよろしいですか？</p>
+<p><strong>業務内容を削除してもよろしいですか？</strong></p>
 <form method="POST">
     {% csrf_token %}
     <h3>- 業務名: {{ business.name }} -</h3>

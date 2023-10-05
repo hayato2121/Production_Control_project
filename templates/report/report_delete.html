@@ -2,7 +2,7 @@
 
 {% block content %}
 <h2>- 作業削除 -</h2>
-<p>作業を削除してもよろしいですか？</p>
+<p><strong>作業を削除してもよろしいですか？</strong></p>
 <form method="POST">
     {% csrf_token %}
     <p>製品名:{{ report.product.name }}</p>

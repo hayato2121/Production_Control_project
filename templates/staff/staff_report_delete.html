@@ -2,7 +2,7 @@
 
 {% block content %}
 <h2>- 日報削除 -</h2>
-<p>日報を削除してもよろしいですか？</p>
+<p><strong>日報を削除してもよろしいですか？</strong></p>
 <form method="POST">
     {% csrf_token %}
     <p>製品名:{{ report.product.name }}</p>

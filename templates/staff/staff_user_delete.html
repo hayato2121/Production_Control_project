@@ -1,7 +1,7 @@
 {% extends 'base_staff.html' %}
 {% block content %}
 <h2>- ユーザー削除 -</h2>
-<p>ユーザーを削除してもよろしいですか？</p>
+<p><strong>ユーザーを削除してもよろしいですか？</strong></p>
 <form method="POST">
     {% csrf_token %}
     <p>ユーザー名:{{ users.username }}</p>

@@ -1,0 +1,18 @@
+{% extends 'base_staff.html' %}
+{% block content %}
+<h2>- 出荷削除 -</h2>
+<p><strong>出荷作業をを削除してもよろしいですか？</strong></p>
+<form method="POST">
+    {% csrf_token %}
+    <p>製品名:{{ shipping.product }}</p>
+    <p>納品先:{{ shipping.delivery }}</p>
+    <p>出荷担当者:{{ shipping.user }}</p>
+    <p>出荷必要数:{{ shipping.shipments_required }}</p>
+    <p>使用在庫1:{{ shipping.stock1 }}</p>
+    <p>使用在庫2:{{ shipping.stock2 }}</p>
+    <p>使用在庫3:{{ shipping.stock3 }}</p>
+    <p>引き継ぎ:{{ shipping.memo }}</p>
+    <input type="submit" value="削除">
+</form>
+<button><a href="{% url 'product_management:staff_shipping_list' %}">出荷リストに戻る</a></button>
+{% endblock %}
