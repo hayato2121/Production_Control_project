@@ -396,7 +396,7 @@ class ShippingDeleteView(LoginRequiredMixin,DeleteView):
 class ShippingEndView(LoginRequiredMixin,UpdateView):
     model = Shipping
     form_class = ShippingEndForm
-    template_name = os.path.join('shipping', 'Shipping_end.html')
+    template_name = os.path.join('shipping', 'shipping_end.html')
     success_url = reverse_lazy('daily_report:report_list')
     
 
