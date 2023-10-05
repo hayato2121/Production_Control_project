@@ -110,7 +110,7 @@ class PasswordResetConfirmView(PasswordResetConfirmView):
     
     form_class = SetPasswordForm
     success_url = reverse_lazy('accounts:login_user')
-    template_name = os.path.join('user', 'user_password_reset_confirm.html')
+    template_name = os.path.join('user', 'user_password_confirm.html')
 
     def form_valid(self, form):
         messages.success(self.request, 'パスワード再設定を完了しました')
