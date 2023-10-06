@@ -60,8 +60,8 @@ class StaffUserForm(RegistUserForm):
 
 #ユーザー編集画面
 class ProfileEditForm(forms.ModelForm):
-    password = forms.CharField(label='パスワード', widget=forms.PasswordInput, required=False)
-    password_confirm = forms.CharField(label='パスワード（確認）', widget=forms.PasswordInput, required=False)
+    password = forms.CharField(label='現行パスワード', widget=forms.PasswordInput, required=True)
+    password_confirm = forms.CharField(label='現行パスワード（確認）', widget=forms.PasswordInput, required=True)
 
     class Meta:
         model = Users
