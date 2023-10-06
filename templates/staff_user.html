@@ -1,14 +1,24 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>{% block title %} 生産管理アプリ {% endblock title %}</title>
+</head>
+<body>
 
-{% block content %}
+    <h1>株式会社</h1>
+    <h2>- 生産管理アプリ -</h2>
 
-<h2>管理者登録画面</h2>
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <input  type="submit" value="管理アカウント作成">
-</form>
-<a href="{% url 'accounts:home' %}">メインページに戻る</a>
+    <h2>管理者登録画面</h2>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input  type="submit" value="管理アカウント作成">
+    </form>
+    <a href="{% url 'accounts:home' %}">メインページに戻る</a>
 
-{% endblock %}
-
+</body>
+</html>

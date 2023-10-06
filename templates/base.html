@@ -8,7 +8,6 @@
     <title>{% block title %} 生産管理アプリ {% endblock title %}</title>
 </head>
 <body>
-    {% if user.is_authenticated %}
         <table>
             <tr>
                 <td><h2>「作業日報&生産管理」</h2></td>
@@ -20,13 +19,6 @@
             </tr>
         </table>
         <hr>
-    {% else %}
-        <h1>株式会社</h1>
-        <h2>- 生産管理アプリ -</h2>
-    {% endif %}
-
-    {% block content %}
-    {% endblock %}
 
     <script>
         function confirmLogout() {
