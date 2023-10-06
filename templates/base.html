@@ -11,7 +11,11 @@
         <table>
             <tr>
                 <td><h2>「作業日報&生産管理」</h2></td>
+                {% if request.user.is_staff %}
+                <td><button><a href="{% url 'product_management:staff_home' %}">ホーム画面</a></button></td>
+                {% else %}
                 <td><button><a href="{% url 'daily_report:report_list' %}">ホーム画面</a></button></td>
+                {% endif %}
                 <td><button onclick="confirmLogout()"><a href="#">ログアウトします</a></button></td>
                 <td></td>
                 <td><h3>{{ request.user.username }}さん</h3></td>
@@ -19,6 +23,8 @@
             </tr>
         </table>
         <hr>
+        {% block content %}
+        {% endblock %}
 
     <script>
         function confirmLogout() {
