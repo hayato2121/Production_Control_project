@@ -1,6 +1,4 @@
 from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
 from django.views.generic.edit import CreateView
 from django.views.generic.base import TemplateView
 # Create your views here.
@@ -51,16 +49,6 @@ class RegistUserView(CreateView):
     #ログインしたのがstaffユーザーだったらstaff_homeにリダイレクトする
     def form_valid(self, form):
         user = form.save(commit=False)
-
-        # バリデーションエラーがある場合にはフォームを再描画し、エラーメッセージを表示
-        try:
-            user.save()
-        except ValidationError as e:
-            for field, errors in e.message_dict.items():
-                for error in errors:
-                    form.add_error(field, error)  # フォームのフィールドにエラーを追加
-
-            return self.render_to_response(self.get_context_data(form=form))  # フォームを再描画
         user.save()
         return super().form_valid(form)
 

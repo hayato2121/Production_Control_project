@@ -21,18 +21,6 @@
     </form>
 
     
-    {% if form.errors %}
-    <div class="errorlist">
-        <ul>
-            {% for field, error_list in form.errors.items %}
-                {% for error in error_list %}
-                <li>{{ error }}</li>
-                {% endfor %}
-            {% endfor %}
-        </ul>
-    </div>
-    {% endif %}
-
     <a href="{% url 'accounts:home' %}">メインページに戻る</a>
 
 </body>

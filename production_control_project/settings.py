@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'utils',
     'accounts',
     'daily_report',
     'product_management'
@@ -111,9 +110,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-    {
-        'NAME': 'utils.validations.CustomPasswordValidator',
     },
 ]
 
