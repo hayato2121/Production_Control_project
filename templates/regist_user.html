@@ -11,6 +11,7 @@
 
     <h1>株式会社</h1>
     <h2>- 生産管理アプリ -</h2>
+    <hr>
 
     <h2>入社登録画面</h2>
     <form method="POST">
@@ -18,6 +19,19 @@
     {{ form.as_p }}
     <input  type="submit" value="社員登録">
     </form>
+
+    
+    {% if form.errors %}
+    <div class="errorlist">
+        <ul>
+            {% for field, error_list in form.errors.items %}
+                {% for error in error_list %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 
     <a href="{% url 'accounts:home' %}">メインページに戻る</a>
 

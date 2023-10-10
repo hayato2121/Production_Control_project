@@ -1,6 +1,8 @@
 from django import forms
 from .models import Users, Departments
 from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from utils.validations import CustomPasswordValidator
 
 from django.contrib.auth.forms import AuthenticationForm ,PasswordChangeForm,PasswordResetForm, SetPasswordForm
 
@@ -13,7 +15,7 @@ class LoginUserForm(AuthenticationForm):
 
 #入社登録
 class RegistUserForm(forms.ModelForm):
-    username = forms.CharField(label='名前',widget=forms.TextInput(attrs={'placeholder': '間の空白なし[山田太郎]'}))
+    username = forms.CharField(label='名前',required=True,widget=forms.TextInput(attrs={'placeholder': '間の空白なし[山田太郎]'}))
     birthday = forms.DateField(label='生年月日',widget=forms.TextInput(attrs={'placeholder': '2000-01-01'}))
     phone = forms.IntegerField(label='緊急連絡先番号',required=True,widget=forms.TextInput(attrs={'placeholder': 'ハイフンなしで入力してください'}))
     email = forms.EmailField(label='連絡先メールアドレス',required=True,widget=forms.TextInput(attrs={'placeholder': 'your_email@example.com'}))
@@ -34,6 +36,18 @@ class RegistUserForm(forms.ModelForm):
         user.save()
         return user
     
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        username = self.cleaned_data.get('username')
+        user = self.instance
+
+        try:
+            CustomPasswordValidator().validate(password, user,username) 
+        except ValidationError as e:
+            for message in e.messages:
+                self.add_error('password', message)
+
+        return password
 
 #staffuser作成
 class StaffUserForm(RegistUserForm):
