@@ -15,7 +15,6 @@
     <p>使用在庫: {{ shippingdetail.stock3 }}</p>
     {% endif %}
 
-    <p><button><a href="{% url 'daily_report:shipping_end' shippingdetail.id %}">作業を終了する</a></button></p>
 
     <p><button><a href="{% url 'daily_report:shipping_delate' shippingdetail.id %}">作業を削除する</a></button></p>
 

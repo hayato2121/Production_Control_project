@@ -530,6 +530,8 @@ class StaffShippingListView(LoginRequiredMixin,View):
             'shipping_list': shipping_list,
         }
         return render(request, self.template_name, context)
+    
+       
 
 
 class StaffShippingDetailView(LoginRequiredMixin,DetailView):

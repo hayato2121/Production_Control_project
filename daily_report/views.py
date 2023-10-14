@@ -15,9 +15,13 @@ from product_management.models import Molding, Stock, Shipping
 import os
 
 from .forms import (ReportStartForm, ReportEndForm, ReportStartInspectionForm,
-                    ReportEndEditForm,StockEditForm,ShippingStartForm,ShippingEndForm,
+                    ReportEndEditForm,StockEditForm,ShippingStartForm
                     
 )
+
+from daily_report.models import Products
+
+from django.http import JsonResponse
 #ログイン状態
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -341,22 +345,6 @@ class StockDeleteView(LoginRequiredMixin,DeleteView):
     
 
 #出荷編集----------------------------------------------------------------------------------------------------
-class ShippingStartView(LoginRequiredMixin, CreateView):
-    template_name = os.path.join('shipping', 'shipping_start.html')
-    form_class = ShippingStartForm
-    success_url = reverse_lazy('daily_report:report_list')
-
-
-    def form_valid(self, form):
-        # ログインしているユーザー情報をフォームにセット
-        form.instance.user = self.request.user
-        return super(ShippingStartView, self).form_valid(form)
-        
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['user'] = self.request.user  # フォームにユーザー情報を渡す
-        return kwargs  
-
 
 class ShippingListView(LoginRequiredMixin, ListView):
     model = Shipping
@@ -380,7 +368,7 @@ class ShippingListView(LoginRequiredMixin, ListView):
         #ユーザーデータ
         context['user'] = self.request.user
         return context
-    
+
     
 class ShippingDetailView(LoginRequiredMixin,DetailView):
     model = Shipping
@@ -391,17 +379,18 @@ class ShippingDeleteView(LoginRequiredMixin,DeleteView):
     model = Shipping
     success_url = reverse_lazy('daily_report:report_list')
     template_name = os.path.join('shipping', 'shipping_delete.html')
-    
 
-class ShippingEndView(LoginRequiredMixin,UpdateView):
+
+class ShippingStartView(LoginRequiredMixin,CreateView):
     model = Shipping
-    form_class = ShippingEndForm
-    template_name = os.path.join('shipping', 'shipping_end.html')
+    form_class = ShippingStartForm
+    template_name = os.path.join('shipping', 'shipping_start.html')
     success_url = reverse_lazy('daily_report:report_list')
     
 
     def form_valid(self, form):
         # フォームのバリデーションが成功した場合の処理
+        form.instance.user = self.request.user
         cleaned_data = form.cleaned_data
         shipments_required = cleaned_data.get('shipments_required', 0)
 
@@ -460,15 +449,14 @@ class ShippingEndView(LoginRequiredMixin,UpdateView):
         
         business = Business.objects.get(name='出荷')
         lot_numbers = ':'.join([str(stock.lot_number) for stock in [stock1, stock2, stock3] if stock is not None])
-        #編集したReportデータを取得しMoldingモデルに同時にCreateする
         report_data = {
-            'product' : self.object.product,
-            'user': self.object.user,
+            'product': cleaned_data.get('product'),
+            'user': self.request.user,
             'business': business,
             'lot_number': lot_numbers,
             'status': '終了',
-            'good_product': self.object.shipments_required,
-            'memo' : self.object.memo,
+            'good_product': cleaned_data.get('shipments_required'),
+            'memo': cleaned_data.get('memo'),
         }
         report, created = Report.objects.get_or_create(**report_data)
     
@@ -480,13 +468,45 @@ class ShippingEndView(LoginRequiredMixin,UpdateView):
 
         return initial
     
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # product_choices 変数をコンテキストに追加
+        context['product_choices'] = Products.objects.all()
+        
+        return context
+    
+    
     #フォームにユーザー情報をわたし、部署ごとの業務内容を選択できるようにする。
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user 
+
         return kwargs
     
+    def get(self, request, *args, **kwargs):
+        if 'product_id' in request.GET:
+            product_id = request.GET['product_id']
+
+            # ここで product_id を使用して必要な処理を実行する
+            stock_options = self.get_stock_options(product_id)
+
+            return JsonResponse(stock_options, safe=False)
+
+        # GETパラメータに product_id がない場合、通常のビュー処理を実行
+        return super().get(request, *args, **kwargs)
     
+    def get_stock_options(self, product_id):
+        try:
+            # ここで product_id を使用して必要なデータを取得する処理を実行
+            product = Products.objects.get(id=product_id)
+            stock_options = Stock.objects.filter(product=product).values('id','created_at','product__name','lot_number','stocks')
+            return list(stock_options)
+        except Products.DoesNotExist:
+            return []
+    
+    
+
    
 #日報最終確認---------------------------------------------------------
 class ReportLogoutConfirm(LoginRequiredMixin, ListView):

@@ -3,7 +3,7 @@ from .views import (
     ReportListView ,ReportStartView ,ReportEndView,ReportDetailView,ReportDeleteView,
     RepoetStartInspectionView,ReportEndEditView,ReportLogoutConfirm,
     StockEditView,StockListView,StockDeleteView,
-    ShippingStartView,ShippingDetailView,ShippingListView,ShippingDeleteView,ShippingEndView
+    ShippingStartView,ShippingDetailView,ShippingListView,ShippingDeleteView
 )
 app_name =  'daily_report'
 
@@ -19,7 +19,6 @@ urlpatterns = [
     path('shipping_list/', ShippingListView.as_view(), name='shipping_list'),
     path('shipping_start/', ShippingStartView.as_view(), name='shipping_start'),
     path('shipping_detail/<int:pk>/',ShippingDetailView.as_view(),name='shipping_detail'),
-    path('shipping_detail/<int:pk>/end/', ShippingEndView.as_view(), name='shipping_end'),
     path('shipping_delete/<int:pk>/',ShippingDeleteView.as_view(),name='shipping_delate'),
 
     path('stocks_list/', StockListView.as_view(), name='stock_list'),

@@ -1,13 +1,221 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>- 作業開始ページ -</h2>
-<h3>出荷に必要な情報を入力してください</h3>
+<h2>- 作業開始 -</h2>
+<h3>出荷に必要な在庫のロッド番号を選んで数を記入してください。</h3>
 <form method="POST">
     {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="スタートする">
-</form>
+    <div>
+        <label >製品名</label>
+        <select id="id_product" name="product">
+            <option value="">選択してください</option>
+            {% for product in product_choices %} 
+                <option value="{{ product.id }}">{{ product.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        {{ form.delivery.label_tag }} 
+        {{ form.delivery }}
+    </div>
+    <div>
+        {{ form.shipments_required.label_tag }} 
+        {{ form.shipments_required }}
+        {{ form.shipments_required.errors }}
+    </div>
+    <div>
+        {{ form.shipping_day.label_tag }}
+        {{ form.shipping_day }}
+        {{ form.shipping_day.errors }}
+    </div>
 
+    <div>
+        {{ form.stock1.label_tag }}
+        <select id="id_stock1" name="stock1" >
+            <option value="">選択してください</option>
+            {% for stock in stock1 %} 
+                <option value="{{ stock.id }}">{{ stock.name }}</option>
+            {% endfor %}
+        </select>
+        <div style="display: flex; align-items: center;">
+            {{ form.sets1.label_tag }} 
+            <input type="number" id="id_sets1" name="sets1" style="display:none; margin-left: 10px;">
+        </div>
+        {{ form.stock1.errors }}
+        {{ form.sets1.errors }}
+    </div>
+
+    <div>
+        {{ form.stock2.label_tag }}
+        <select id="id_stock2" name="stock2">
+            <option value="">選択してください</option>
+            {% for stock in stock2 %} 
+                <option value="{{ stock.id }}">{{ stock.name }}</option>
+            {% endfor %}
+        </select>
+        <div style="display: flex; align-items: center;">
+            {{ form.sets2.label_tag }} 
+            <input type="number" id="id_sets2" name="sets2" style="display:none; margin-left: 10px;">
+        </div>
+        {{ form.stock2.errors }}
+        {{ form.sets2.errors }}
+    </div>
+    
+    <div>
+        {{ form.stock3.label_tag }}
+        <select id="id_stock3" name="stock3">
+            <option value="">選択してください</option>
+            {% for stock in stock3 %} 
+                <option value="{{ stock.id }}">{{ stock.name }}</option>
+            {% endfor %}
+        </select>
+        <div style="display: flex; align-items: center;">
+            {{ form.sets3.label_tag }} 
+            <input type="number" id="id_sets3" name="sets3" style="display:none;margin-left: 10px;">
+        </div>
+        {{ form.stock3.errors }}
+        {{ form.sets3.errors }}
+    </div>
+       
+    <div>
+        {{ form.memo.label_tag }}
+        {{ form.memo }}
+        {{ form.memo.errors }}
+    </div>
+    {{ forms.errors }}
+    <input type="submit" value="業務を開始する">
+</form>
 <p><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></p>
+
+<script>
+
+    document.addEventListener("DOMContentLoaded", function () {
+    var productSelect = document.querySelector("#id_product");
+    var stock1Select = document.querySelector("#id_stock1");
+    var stock2Select = document.querySelector("#id_stock2");
+    var stock3Select = document.querySelector("#id_stock3");
+    var sets1Input = document.querySelector("#id_sets1");
+    var sets2Input = document.querySelector("#id_sets2");
+    var sets3Input = document.querySelector("#id_sets3");
+
+   
+    var stockSelects = [stock1Select, stock2Select, stock3Select];
+
+    stockSelects.forEach(function (selectElement) {
+        selectElement.innerHTML = ''; // セレクトボックスをクリア
+
+        addOption(selectElement, "選択してください", ""); // "選択してください" オプションを追加
+    });
+
+
+    function addOption(selectElement, text, value) {
+        var option = document.createElement('option');
+        option.text = text;
+        option.value = value;
+        selectElement.appendChild(option);
+    }
+
+    var defaultOptionValue = "";
+
+    productSelect.addEventListener("change", function () {
+        var selectedProduct = productSelect.value;
+
+        stock1Select.innerHTML = '<option value="">製品名を選択してください</option>';
+        stock2Select.innerHTML = '<option value="">製品名を選択してください</option>';
+        stock3Select.innerHTML = '<option value="">製品名を選択してください</option>';
+
+        if (selectedProduct) {
+            // 選択した product に基づいて stock オプションを読み込む
+            $.ajax({
+                url: `{% url 'daily_report:shipping_start' %}`,
+                type: "GET",
+                data: { product_id: selectedProduct },
+                success: function (data) {
+                    // サーバーからのデータをもとに選択肢を動的に生成
+
+                    updateSelectOptions(stock1Select, data);
+                    updateSelectOptions(stock2Select, data);
+                    updateSelectOptions(stock3Select, data);
+                },
+                error: function () {
+                    // エラーハンドリング
+                }
+            });
+        } else {
+            
+        }
+    });
+
+    var stockSelects = [stock1Select, stock2Select, stock3Select];
+
+    stockSelects.forEach(function (selectElement) {
+        selectElement.innerHTML = ''; // セレクトボックスをクリア
+
+        addOption(selectElement, "選択してください", ""); // "選択してください" オプションを追加
+    });
+
+    sets1Input.style.display = "none";
+    sets2Input.style.display = "none";
+    sets3Input.style.display = "none";
+
+    productSelect.addEventListener("change", function () {
+    // ここに非表示にしたい要素を操作するコードを追加
+        sets1Input.style.display = "none";
+        sets2Input.style.display = "none";
+        sets3Input.style.display = "none";
+    });
+
+    stockSelects.forEach(function (selectElement) {
+        selectElement.addEventListener("change", function () {
+            var setsInput = sets1Input; // ここで適切な setsInput を選択
+
+            if (selectElement === stock1Select) {
+                setsInput = sets1Input;
+            } else if (selectElement === stock2Select) {
+                setsInput = sets2Input;
+            } else if (selectElement === stock3Select) {
+                setsInput = sets3Input;
+            }
+
+            if (selectElement.value === "") {
+                setsInput.value = "";
+                setsInput.disabled = true;
+                setsInput.style.display = "none";
+            } else {
+                setsInput.value = "";
+                setsInput.disabled = false;
+                setsInput.style.display = "block";
+            }
+        });
+    });
+
+
+    function updateSelectOptions(selectElement, data, selectedProduct) {
+
+        while (selectElement.firstChild) {
+            selectElement.removeChild(selectElement.firstChild);
+        }
+
+        addOption(selectElement, "選択してください", "");
+
+        data.forEach(function (item) {
+            if (item.product_id === selectedProduct) {
+                var createdDate = new Date(item.created_at);
+                var year = createdDate.getFullYear().toString().slice(-2);
+                var month = ('0' + (createdDate.getMonth() + 1)).slice(-2);
+                var day = ('0' + createdDate.getDate()).slice(-2);
+                var formattedDate = year + '/' + month + '/' + day;
+                var stockInfo = `[${formattedDate}] : ${item.product__name} : ${item.lot_number} : 在庫数 = 残り ${item.stocks}`;
+                var option = document.createElement('option');
+                option.value = item.id;
+                option.textContent = stockInfo;
+                selectElement.appendChild(option);
+            }
+        });
+    }
+    
+});
+    
+</script>
+
 {% endblock %}

@@ -5,6 +5,9 @@ from .models import Business,Products
 from product_management.models import Molding, Shipping, Stock
 from accounts.models import Users
 
+
+from django.http import JsonResponse
+
 #ランダム数値
 import random 
 import string
@@ -145,6 +148,7 @@ class ReportStartInspectionForm(forms.ModelForm):
         return report
     
 #--------------------------------------------------------------------------------------------------
+"""
 class ShippingStartForm(forms.ModelForm):
     shipping_day = forms.DateField(label='出荷日',widget=forms.TextInput(attrs={'placeholder': '2000-01-01'}))
 
@@ -164,7 +168,7 @@ class ShippingStartForm(forms.ModelForm):
         if commit:
             shipping.save()
         return shipping
-
+"""
         
 #--------------------------------------------------------------------------------------------------
 class ReportShippingEndForm(forms.ModelForm):
@@ -316,9 +320,7 @@ class StockEditForm(forms.ModelForm):
 
 
 #-------------------------------------------------------------------------------------------------
-class ShippingEndForm(forms.ModelForm):
-    product = forms.CharField(label='製品名')
-    delivery = forms.CharField(label='納品先')
+class ShippingStartForm(forms.ModelForm):
     memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.Textarea(attrs={'style': 'width: 200px; height: 100px; white-space:nomal;'}))
     sets1 = forms.IntegerField(label='在庫使用1',required = False)
     sets2 = forms.IntegerField(label='在庫使用2',required = False)
@@ -326,47 +328,69 @@ class ShippingEndForm(forms.ModelForm):
     
     class Meta:
         model = Shipping
-        fields = ['user','shipping_day','shipments_required',
+        fields = ['product','delivery','shipping_day','shipments_required',
                   'stock1','stock2','stock3','memo']
     
     #初期値設定
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
-        super(ShippingEndForm, self).__init__(*args, **kwargs)
+        super(ShippingStartForm, self).__init__(*args, **kwargs)
+
+        self.fields['product'].queryset = Products.objects.all()
 
         #必須にしない
         self.fields['stock1'].required = False
         self.fields['stock2'].required = False
         self.fields['stock3'].required = False
+    
 
-        # ユーザーの部署と紐づく業務内容のみを選択肢として表示
-        if self.user and self.user.department:
-            self.fields['user'].queryset = Users.objects.filter(department=self.user.department)
+    #マイナスを入力できないようにする,０に入らないようにする,空白を無しにする
+    def clean_sets1(self):
+        sets1 = self.cleaned_data.get('sets1')
+        if sets1 is not None:
+            if sets1 < 0:
+                raise forms.ValidationError('負の値を入力できません')
+            elif sets1 == 0:
+                raise forms.ValidationError('0のままでは入力できません')
+        return sets1
+        
+    def clean_sets2(self):
+        sets2 = self.cleaned_data.get('sets2')
+        if sets2 is not None:
+            if sets2 < 0:
+                raise forms.ValidationError('負の値を入力できません')
+            elif sets2 == 0:
+                raise forms.ValidationError('0のままでは入力できません')
+        return sets2
+    
+    def clean_sets3(self):
+        sets3 = self.cleaned_data.get('sets3')
+        if sets3 is not None:
+            if sets3 < 0:
+                raise forms.ValidationError('負の値を入力できません')
+            elif sets3 == 0:
+                raise forms.ValidationError('0のままでは入力できません')
+        return sets3
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        stock1 = cleaned_data.get('stock1')
+        stock2 = cleaned_data.get('stock2')
+        stock3 = cleaned_data.get('stock3')
 
+        # setsとstockのバリデーション
+        for i in range(1, 4):
+            sets_key = f'sets{i}'
+            stock_key = f'stock{i}'
+            sets = cleaned_data.get(sets_key)
+            stock = cleaned_data.get(stock_key)
 
-        #下のread_onlyだけでは、forinkeyで紐付けされているフィールドは編集できてしまうので、
-        #詳細データからデータを引き出し初期値に登録し、上でフィールドをcharfieldsにすることで
-        #編集できなくし、データにも保存できる。
-        if 'instance' in kwargs and kwargs['instance']:
-            
-            initial_data ={
-                'product': kwargs['instance'].product,
-                'delivery': kwargs['instance'].delivery,
-            }
-            self.initial.update(initial_data)
+            if not sets and stock:
+                self.add_error(sets_key, '在庫を入力し直してください')
 
-        # 製品フィールドから選択された製品を取得
-        selected_product = self.initial.get('product')
-        # 製品に関連する在庫オブジェクトをクエリして取得し、選択肢として設定
-        if selected_product:
-            self.fields['stock1'].queryset = Stock.objects.filter(product=selected_product)
-            self.fields['stock2'].queryset = Stock.objects.filter(product=selected_product)
-            self.fields['stock3'].queryset = Stock.objects.filter(product=selected_product)
-       
-        #初期値に設定したデータを編集できないようにする
-        for field_name in [ 'product','delivery','shipping_day','shipments_required',]:
-            self.fields[field_name].widget.attrs['readonly'] = 'readonly'
+                cleaned_data[sets_key] = None
+                
+        return cleaned_data
 
-            
 
 

@@ -2,6 +2,17 @@
 
 {% block content %}
 <h2>- 所属部署:{{ user.department.name }} -</h2>
+
+{% if request.user.department.name == '製造部' %}
+    <button><a href="{% url 'daily_report:report_start' %}">作業をスタートする</a></button>
+    {% elif request.user.department.name == '検査部' %}
+    <button><a href="{% url 'daily_report:report_start_inspection' %}">作業をスタートする</a></button>
+    {% elif request.user.department.name == '出荷部' %}
+    <button><a href="{% url 'daily_report:shipping_start'%}">出荷を記帳する</a></button>
+    {% else %}
+    <button><a href="{% url 'daily_report:report_start' %}">作業をスタートする</a></button>
+{% endif %}
+
 <!--作業一覧-->
 {% if request.user.department.name == '出荷部' %}
     {% if shippings %}
@@ -15,7 +26,10 @@
                             <td>出荷日</td>
                             <td>出荷数</td>
                             <td>引き継ぎ</td>
-                            <td>ステータス</td>
+                            <td>使用在庫1</td>
+                            <td>使用在庫2</td>
+                            <td>使用在庫3</td>
+                            
                         </tr>
                     </thead>
                     <tbody>
@@ -26,23 +40,17 @@
                                 <td>{{ shipping.shipping_day }}</td>
                                 <td>{{ shipping.shipments_required }}</td>
                                 <td>{{ shipping.memo }}</td>
-                                {% if shipping.stock1 or shipping.stock2 or shipping.stock3 %}
-                                <td><strong>終了</strong></td>
-                                <td><button><a href="{% url 'daily_report:shipping_detail' pk=shipping.id %}">結果を編集する</a></button></td>
-                                {% else %}
-                                <td><strong>実行中</strong></td>
-                                <td><button><a href="{% url 'daily_report:shipping_detail' pk=shipping.id %}">作業を終了する</a></button></td>
-                                {% endif %}
-                               
-                            
+                                <td>{{shipping.stock1.lot_number}}</td>
+                                <td>{{shipping.stock2.lot_number}}</td>
+                                <td>{{shipping.stock3.lot_number}}</td>
+                                <td><button><a href="{% url 'daily_report:shipping_detail' pk=shipping.id %}">出荷の詳細を見る</a></button></td>
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
-
-                <h4>※出荷業務の入力間違いがあれば、必ず在庫を修正してください。</h4>
-                <button><a href="{% url 'daily_report:stock_list' %}">在庫を編集できます。</a></button>
             </ul>
+            <h4>※出荷業務の入力間違いがあれば、必ず在庫を修正してください。</h4>
+            <p><button><a href="{% url 'daily_report:stock_list' %}">在庫を編集できます。</a></button></p>
     {% endif %}
 {% else %}
     {% if reports %}
@@ -91,15 +99,6 @@
 {% endif %}
 
 
-{% if request.user.department.name == '製造部' %}
-    <button><a href="{% url 'daily_report:report_start' %}">作業をスタートする_製造</a></button>
-    {% elif request.user.department.name == '検査部' %}
-    <button><a href="{% url 'daily_report:report_start_inspection' %}">作業をスタートする_検査</a></button>
-    {% elif request.user.department.name == '出荷部' %}
-    <button><a href="{% url 'daily_report:shipping_start'%}">作業をスタートする_出荷</a></button>
-    {% else %}
-    <button><a href="{% url 'daily_report:report_start' %}">作業をスタートする</a></button>
-{% endif %}
 
 <p><button><a href="{% url 'daily_report:logout' %}">本日の作業を終了する</a></button></p>
 
