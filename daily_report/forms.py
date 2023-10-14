@@ -389,6 +389,17 @@ class ShippingStartForm(forms.ModelForm):
                 self.add_error(sets_key, '在庫を入力し直してください')
 
                 cleaned_data[sets_key] = None
+
+            # 同じ在庫の選択を検証
+        if stock1 and stock2 and stock1.id == stock2.id:
+            self.add_error('stock2', '同じロッドナンバーの在庫を複数選択することはできません')
+
+        if stock1 and stock3 and stock1.id == stock3.id:
+            self.add_error('stock3', '同じロッドナンバーの在庫を複数選択することはできません')
+
+        if stock2 and stock3 and stock2.id == stock3.id:
+            self.add_error('stock3', '同じロッドナンバーの在庫を複数選択することはできません')
+
                 
         return cleaned_data
 
