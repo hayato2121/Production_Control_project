@@ -5,6 +5,8 @@ from .models import Business,Products
 from product_management.models import Molding, Shipping, Stock
 from accounts.models import Users
 
+from datetime import date
+today = date.today()
 
 from django.http import JsonResponse
 
@@ -118,20 +120,30 @@ class ReportEndForm(forms.ModelForm):
 
 #--------------------------------------------------------------------------------------------------
 class ReportStartInspectionForm(forms.ModelForm):
-    molding_lot_number = forms.ChoiceField(label='成形品ロッドナンバー', choices=[])
+    lot_number = forms.ChoiceField(label='成形品ロッドナンバー', choices=[])
 
     class Meta:
         model = Report
-        fields = ['molding_lot_number','business']
+        fields = ['lot_number','business']
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('user', None)
         super(ReportStartInspectionForm, self).__init__(*args, **kwargs)
-
+        
         # Molding モデルから lot_number の値を取得して選択肢としてセットします
-        molding_lot_numbers = Molding.objects.values_list('lot_number', flat=True).distinct()
-        molding_choices = [(lot_number, lot_number) for lot_number in molding_lot_numbers] #unique_molding_lot_number]
-        self.fields['molding_lot_number'].choices = molding_choices
+
+        user_obj = self.user
+            # '検査部' の場合の条件を設定
+        excluded_lot_numbers = Report.objects.filter(
+            user=user_obj,
+            created_at__date=today,
+            business__name='検査',  # '検査' という業務名に応じて調整
+        ).values_list('lot_number', flat=True)
+        
+        all_molding_lot_numbers = Molding.objects.values_list('lot_number', flat=True).distinct()
+        molding_lot_numbers = [lot_number for lot_number in all_molding_lot_numbers if lot_number not in excluded_lot_numbers]
+        molding_choices = [(lot_number, lot_number) for lot_number in molding_lot_numbers]
+        self.fields['lot_number'].choices = molding_choices
 
         #ユーザーの部署に合わせて業務内容を表示
         if self.user and self.user.department:
@@ -147,28 +159,7 @@ class ReportStartInspectionForm(forms.ModelForm):
             report.save()
         return report
     
-#--------------------------------------------------------------------------------------------------
-"""
-class ShippingStartForm(forms.ModelForm):
-    shipping_day = forms.DateField(label='出荷日',widget=forms.TextInput(attrs={'placeholder': '2000-01-01'}))
 
-    class Meta:
-        model = Shipping
-        fields = ['product', 'delivery','shipping_day','shipments_required']
-
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
-        super(ShippingStartForm, self).__init__(*args, **kwargs)
-        
-    #userフィールドに自動でリクエストユーザーをする。
-    def save(self, commit=True):
-        shipping = super(ShippingStartForm, self).save(commit=False)
-        if self.user:
-            shipping.user = self.user
-        if commit:
-            shipping.save()
-        return shipping
-"""
         
 #--------------------------------------------------------------------------------------------------
 class ReportShippingEndForm(forms.ModelForm):
