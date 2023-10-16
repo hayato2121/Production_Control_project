@@ -132,10 +132,8 @@ class ReportStartInspectionForm(forms.ModelForm):
         
         # Molding モデルから lot_number の値を取得して選択肢としてセットします
 
-        user_obj = self.user
             # '検査部' の場合の条件を設定
         excluded_lot_numbers = Report.objects.filter(
-            user=user_obj,
             created_at__date=today,
             business__name='検査',  # '検査' という業務名に応じて調整
         ).values_list('lot_number', flat=True)
