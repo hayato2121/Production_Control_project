@@ -290,7 +290,7 @@ class ReportShippingEndEditForm(forms.ModelForm):
 
 class StockEditForm(forms.ModelForm):
     memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.Textarea(attrs={'style': 'width: 200px; height: 100px; white-space:nomal;'}))
-
+    stocks = forms.IntegerField(label='在庫数',required = False)
     class Meta:
         model = Stock
         fields = [ 'product','lot_number',
@@ -306,7 +306,15 @@ class StockEditForm(forms.ModelForm):
 
         self.fields['molding_user'].queryset = Users.objects.filter(department__name='製造部')
         self.fields['inspection_user'].queryset = Users.objects.filter(department__name='検査部')
-
+    
+    #マイナスを入力できないようにする,０に入らないようにする,空白を無しにする
+    def clean(self):
+        stocks = self.cleaned_data.get('stocks')
+        if stocks is not None:
+            if stocks < 0:
+                raise forms.ValidationError('負の値を入力できません')
+            elif stocks == 0:
+                raise forms.ValidationError('0は入力できません。在庫が0の場合は、削除ボタンを押して削除してください')
 
 #-------------------------------------------------------------------------------------------------
 class ShippingStartForm(forms.ModelForm):

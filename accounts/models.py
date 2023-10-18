@@ -54,7 +54,7 @@ class UsersManager(BaseUserManager):
 class Users(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=150, unique=True, verbose_name="ユーザー名")
     birthday = models.DateField(null=True,blank=True, verbose_name="生年月日")
-    phone = models.IntegerField(null=True,blank=True, verbose_name="携帯番号")
+    phone = models.CharField(max_length=11,null=True,blank=True, verbose_name="携帯番号")
     email = models.EmailField(max_length=255, unique=True, verbose_name="メールアドレス")
     #部署テーブルとの紐付け
     department = models.ForeignKey(

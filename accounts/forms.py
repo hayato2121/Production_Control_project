@@ -6,6 +6,9 @@ from django.contrib.auth.forms import AuthenticationForm ,UserCreationForm,Passw
 
 from django.contrib.auth.hashers import make_password
 
+import re
+
+
 #ログイン
 class LoginUserForm(AuthenticationForm):
     username = forms.CharField(label='名前')
@@ -15,7 +18,7 @@ class LoginUserForm(AuthenticationForm):
 class RegistUserForm(UserCreationForm):
     username = forms.CharField(label='名前',required=True,widget=forms.TextInput(attrs={'placeholder': '間の空白なし[山田太郎]'}))
     birthday = forms.DateField(label='生年月日',widget=forms.TextInput(attrs={'placeholder': '2000-01-01'}))
-    phone = forms.IntegerField(label='緊急連絡先番号',required=True,widget=forms.TextInput(attrs={'placeholder': 'ハイフンなしで入力してください'}))
+    phone = forms.CharField(label='緊急連絡先番号', max_length=11, required=True, widget=forms.TextInput(attrs={'placeholder': 'ハイフンなしで入力してください'}))
     email = forms.EmailField(label='連絡先メールアドレス',required=True,widget=forms.TextInput(attrs={'placeholder': 'your_email@example.com'}))
     department = forms.ModelChoiceField(queryset=Departments.objects,
         label='所属部署', 
@@ -24,6 +27,12 @@ class RegistUserForm(UserCreationForm):
     class Meta:
         model = Users
         fields = ('username', 'birthday','phone', 'email', 'department')
+
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        if not re.match(r'^\d+$', phone) or len(phone) != 11:
+            raise forms.ValidationError('電話番号は11桁の数字のみにしてください。ハイフンなどの特殊文字は使用しないでください。')
+        return phone
 
 #staffuser作成
 class StaffUserForm(RegistUserForm):
@@ -41,6 +50,7 @@ class StaffUserForm(RegistUserForm):
 
 #ユーザー編集画面
 class ProfileEditForm(forms.ModelForm):
+    phone = forms.CharField(label='緊急連絡先番号', max_length=11, required=True, widget=forms.TextInput(attrs={'placeholder': 'ハイフンなしで入力してください'}))
     password = forms.CharField(label='現行パスワード', widget=forms.PasswordInput, required=True)
     password_confirm = forms.CharField(label='現行パスワード（確認）', widget=forms.PasswordInput, required=True)
 
@@ -57,6 +67,12 @@ class ProfileEditForm(forms.ModelForm):
             raise forms.ValidationError('パスワードと確認用パスワードが一致しません。')
         
         return password_confirm
+    
+    def clean_phone(self):
+        phone = self.cleaned_data.get('phone')
+        if not re.match(r'^\d+$', phone) or len(phone) != 11:
+            raise forms.ValidationError('電話番号は11桁の数字のみにしてください。ハイフンなどの特殊文字は使用しないでください。')
+        return phone
 
     def save(self, commit=True):
         user = super().save(commit=False)
