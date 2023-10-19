@@ -469,9 +469,6 @@ class ShippingStartView(LoginRequiredMixin,CreateView):
     def get_initial(self):
         initial = super().get_initial()
 
-        session_data = self.request.session.get('shipping_form_data')
-        if session_data:
-            initial.update(session_data)
 
         return initial
     

@@ -352,9 +352,6 @@ class ShippingStartForm(forms.ModelForm):
           
         return cleaned_data
     
-    def save_data_to_session(self):
-        data = self.cleaned_data
-        self.request.session['shipping_form_data'] = data
 
 
 
