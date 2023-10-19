@@ -49,9 +49,9 @@
                     </tbody>
                 </table>
             </ul>
-            <h4>※出荷業務の入力間違いがあれば、必ず在庫を修正してください。</h4>
-            <p><button><a href="{% url 'daily_report:stock_list' %}">在庫を編集できます。</a></button></p>
     {% endif %}
+    <h4>※出荷業務の入力間違いがあれば、必ず在庫を修正してください。</h4>
+    <p><button><a href="{% url 'daily_report:stock_list' %}">在庫を編集できます。</a></button></p>
 {% else %}
     {% if reports %}
     <ul>
