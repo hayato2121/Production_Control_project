@@ -348,9 +348,13 @@ class ShippingStartForm(forms.ModelForm):
 
         if stock2 and stock3 and stock2.id == stock3.id:
             self.add_error('stock3', '同じロッドナンバーの在庫を複数選択することはできません')
-
-                
+            
+          
         return cleaned_data
+    
+    def save_data_to_session(self):
+        data = self.cleaned_data
+        self.request.session['shipping_form_data'] = data
 
 
 

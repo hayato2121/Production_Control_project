@@ -6,7 +6,7 @@
 <form method="POST">
     {% csrf_token %}
     <div>
-        <label >製品名</label>
+        {{ form.product.label_tag }}
         <select id="id_product" name="product">
             <option value="">選択してください</option>
             {% for product in product_choices %} 

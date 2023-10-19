@@ -56,7 +56,21 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+#セッション設定-------------------------------------------------
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+SESSION_COOKIE_NAME = 'my_session_key'
+
+# セッションの有効期限を指定（秒単位）
+SESSION_COOKIE_AGE = 3600  # 1時間
+
+# セッションがブラウザを閉じたときに無効になるかどうかを設定
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# セッションデータを暗号化するためのキー
+SECRET_KEY = 'your_secret_key_here'
+
+#----------------------
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 

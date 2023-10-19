@@ -26,7 +26,7 @@ from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 from datetime import date
-
+from django.contrib import messages
 # Create your views here.
     
 #作業start----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -447,7 +447,7 @@ class ShippingStartView(LoginRequiredMixin,CreateView):
         if error_occurred:
             return self.form_invalid(form)
         
-        
+
         business = Business.objects.get(name='出荷')
         lot_numbers = ':'.join([str(stock.lot_number) for stock in [stock1, stock2, stock3] if stock is not None])
         report_data = {
@@ -460,12 +460,18 @@ class ShippingStartView(LoginRequiredMixin,CreateView):
             'memo': cleaned_data.get('memo'),
         }
         report, created = Report.objects.get_or_create(**report_data)
+
+        form.save_data_to_session()
     
         return super().form_valid(form)
     
     #フォームに初期値を渡す
     def get_initial(self):
         initial = super().get_initial()
+
+        session_data = self.request.session.get('shipping_form_data')
+        if session_data:
+            initial.update(session_data)
 
         return initial
     
@@ -476,6 +482,10 @@ class ShippingStartView(LoginRequiredMixin,CreateView):
         context['product_choices'] = Products.objects.all()
         
         return context
+    
+    def form_invalid(self, form):
+        messages.error(self.request, 'エラーが発生しました。フォームを再確認してください。')
+        return super().form_invalid(form)
     
     
     #フォームにユーザー情報をわたし、部署ごとの業務内容を選択できるようにする。
