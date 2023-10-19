@@ -27,7 +27,7 @@ STATIC_DIR = os.path.join(BASE_DIR, 'static')
 SECRET_KEY = get_random_secret_key()
 
 
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['localhost','.pythonanywhere.com','hayato21.pythonanywhere.com']
 

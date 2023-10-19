@@ -460,8 +460,6 @@ class ShippingStartView(LoginRequiredMixin,CreateView):
             'memo': cleaned_data.get('memo'),
         }
         report, created = Report.objects.get_or_create(**report_data)
-
-        form.save_data_to_session()
     
         return super().form_valid(form)
     
