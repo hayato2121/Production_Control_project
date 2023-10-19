@@ -30,6 +30,17 @@ class StaffProductCreateForm(forms.ModelForm):
         model = Products
         fields = ['name', 'code' , 'quantity', 'memo']
 
+    def clean_quantity(self):
+        quantity = self.cleaned_data.get('quantity')
+        if quantity is not None:
+            if quantity < 0:
+                raise forms.ValidationError('負の値を入力できません')
+            elif quantity == 0:
+                raise forms.ValidationError('0は入力できません.0を入力する場合は、削除してください')
+        return quantity
+
+    
+
 #製品編集フォーム
 class StaffProductEditForm(forms.ModelForm):
 
@@ -38,6 +49,15 @@ class StaffProductEditForm(forms.ModelForm):
     class Meta:
         model = Products
         fields = ['name', 'code' , 'quantity', 'memo']
+
+    def clean_quantity(self):
+        quantity = self.cleaned_data.get('quantity')
+        if quantity is not None:
+            if quantity < 0:
+                raise forms.ValidationError('負の値を入力できません')
+            elif quantity == 0:
+                raise forms.ValidationError('0は入力できません.0を入力する場合は、削除してください')
+        return quantity
 
 
 #業務内容作成フォーム
@@ -58,6 +78,22 @@ class StaffReportEditForm(forms.ModelForm):
         model = Report
         fields = ['user','product','good_product','bad_product','status','memo']
 
+    def clean_good_product(self):
+        good_product = self.cleaned_data.get('good_product')
+        if good_product is not None:
+            if good_product < 0:
+                raise forms.ValidationError('負の値を入力できません')
+            elif good_product == 0:
+                raise forms.ValidationError('0は入力できません.0を入力する場合は、日報ごと削除してください')
+        return good_product
+
+    def clean_bad_product(self):
+        bad_product = self.cleaned_data.get('bad_product')
+        if bad_product is not None:
+            if bad_product < 0:
+                raise forms.ValidationError('負の値を入力できません')
+        return bad_product
+
 
 #成形品編集フォーム
 class StaffMoldingEditForm(forms.ModelForm):
@@ -68,6 +104,22 @@ class StaffMoldingEditForm(forms.ModelForm):
     class Meta:
         model = Molding
         fields = ['product','lot_number','good_molding','bad_molding','user','memo']
+
+    def clean_good_molding(self):
+        good_molding = self.cleaned_data.get('good_molding')
+        if good_molding is not None:
+            if good_molding < 0:
+                raise forms.ValidationError('負の値を入力できません')
+            elif good_molding == 0:
+                raise forms.ValidationError('0は入力できません.0を入力する場合は、削除してください')
+        return good_molding
+
+    def clean_badmolding(self):
+        bad_molding = self.cleaned_data.get('bad_molding')
+        if bad_molding is not None:
+            if bad_molding < 0:
+                raise forms.ValidationError('負の値を入力できません')
+        return bad_molding   
 
 #user編集フォーム
 class StaffUserEditForm(forms.ModelForm):

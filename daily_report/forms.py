@@ -117,6 +117,22 @@ class ReportEndForm(forms.ModelForm):
             except Molding.DoesNotExist:
                 self.add_error('good_product', '該当するデータが見つかりませんでした。')
 
+    def clean_sets(self):
+        sets = self.cleaned_data.get('sets')
+        if sets is not None:
+            if sets < 0:
+                raise forms.ValidationError('負の値を入力できません')
+            elif sets == 0:
+                raise forms.ValidationError('0は入力できません.0を入力する場合は、日報ごと削除してください')
+        return sets
+
+    def clean_bad_product(self):
+        bad_product = self.cleaned_data.get('bad_product')
+        if bad_product is not None:
+            if bad_product < 0:
+                raise forms.ValidationError('負の値を入力できません')
+        return bad_product
+    
 
 #--------------------------------------------------------------------------------------------------
 class ReportStartInspectionForm(forms.ModelForm):
@@ -158,50 +174,7 @@ class ReportStartInspectionForm(forms.ModelForm):
         return report
     
 
-        
-#--------------------------------------------------------------------------------------------------
-class ReportShippingEndForm(forms.ModelForm):
-    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.TextInput(attrs={'style': 'width: 200px; height: 100px;'}))
-    sets1 = forms.IntegerField(label='在庫使用1',required = False)
-    sets2 = forms.IntegerField(label='在庫使用2',required = False)
-    sets3 = forms.IntegerField(label='在庫使用3',required = False)
-
-    class Meta:
-        model = Shipping
-        fields = ['product','user','delivery','shipping_day','shipments_required',
-                  'stock1','stock2','stock3','memo']
-
-    #初期値設定
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
-        super(ReportShippingEndForm, self).__init__(*args, **kwargs)
-
-        self.fields['stock1'].required = False
-        self.fields['stock2'].required = False
-        self.fields['stock3'].required = False
-
-        # 出荷部の人しか選べないようにする。
-        if self.user and self.user.department.name == '出荷部':
-            # 出荷部のユーザーのみを選択肢として表示
-            self.fields['user'].queryset = Users.objects.filter(department__name='出荷部')
-        else:
-            # 出荷部のユーザーでない場合は何も表示しない
-            self.fields['user'].queryset = Users.objects.none()
-
-
-        #stock1,stock2,stock3の選択肢を選択した製品名の在庫だけにする
-        product  = self.initial.get('product')
-        if product:
-            #product_idを取得して、product_idをもとにnamaを取得してproductフィールドに保存する
-            self.fields['stock1'].queryset = Stock.objects.filter(product = product)
-            self.fields['stock2'].queryset = Stock.objects.filter(product = product)
-            self.fields['stock3'].queryset = Stock.objects.filter(product = product)
-
-
-        #初期値に設定したデータを編集できないようにする
-        for field_name in [ 'product', 'user']:
-            self.fields[field_name].widget.attrs['readonly'] = 'readonly'
-
+    
 #--------------------------------------------------------------------------------------------------
 class ReportEndEditForm(forms.ModelForm):
     product = forms.CharField(label='製品名')
@@ -246,45 +219,23 @@ class ReportEndEditForm(forms.ModelForm):
         for field_name in [ 'product', 'business', 'user','lot_number']:
             self.fields[field_name].widget.attrs['readonly'] = 'readonly'
 
+    def clean_good_product(self):
+        good_product = self.cleaned_data.get('good_product')
+        if good_product is not None:
+            if good_product < 0:
+                raise forms.ValidationError('負の値を入力できません')
+            elif good_product == 0:
+                raise forms.ValidationError('0は入力できません.0を入力する場合は、日報ごと削除してください')
+        return good_product
 
-#-------------------------------------------------------------------------------------------------
-
-class ReportShippingEndEditForm(forms.ModelForm):
+    def clean_bad_product(self):
+        bad_product = self.cleaned_data.get('bad_product')
+        if bad_product is not None:
+            if bad_product < 0:
+                raise forms.ValidationError('負の値を入力できません')
+        return bad_product
     
-    memo = forms.CharField(label='引き継ぎ',initial='なし',widget=forms.Textarea(attrs={'style': 'width: 200px; height: 100px; white-space:nomal;'}))
 
-    class Meta:
-        model = Shipping
-        fields = ['product','user','delivery','shipping_day','shipments_required',
-                  'stock1','stock2','stock3','memo']
-    
-    
-    #初期値設定
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
-        super(ReportShippingEndEditForm, self).__init__(*args, **kwargs)
-
-
-        # ユーザーの部署と紐づく業務内容のみを選択肢として表示
-        if self.user and self.user.department:
-            self.fields['user'].queryset = Users.objects.filter(department=self.user.department)
-
-        
-        #詳細データからデータを引き出し初期値に登録
-        if 'instance' in kwargs and kwargs['instance']:
-            
-            initial_data ={
-                'product': kwargs['instance'].product,
-                'user': kwargs['instance'].user,
-                'delivery': kwargs['instance'].delivery,
-                'shipping_day': kwargs['instance'].shipping_day,
-                'shipments_required': kwargs['instance'].shipments_required,
-                'stock1': kwargs['instance'].stock1,
-                'stock2': kwargs['instance'].stock2,
-                'stock3': kwargs['instance'].stock3,
-                'memo': kwargs['instance'].memo
-            }
-            self.initial.update(initial_data)
 
 #-------------------------------------------------------------------------------------------------
 
@@ -339,6 +290,7 @@ class ShippingStartForm(forms.ModelForm):
         self.fields['stock1'].required = False
         self.fields['stock2'].required = False
         self.fields['stock3'].required = False
+
     
 
     #マイナスを入力できないようにする,０に入らないようにする,空白を無しにする

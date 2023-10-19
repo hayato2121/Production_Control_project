@@ -13,12 +13,6 @@
         {{ form.business.label_tag }}
         {{ form.business }}
     </div>
-    {% if user.department.name == '出荷部' %}
-        <div>
-            {{ form.good_product.label_tag }}
-            {{ form.good_product }}
-        </div>
-    {% endif %}
     <input type="submit" value="スタートする">
 </form>
 

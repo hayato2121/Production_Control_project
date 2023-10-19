@@ -447,6 +447,7 @@ class ShippingStartView(LoginRequiredMixin,CreateView):
         if error_occurred:
             return self.form_invalid(form)
         
+        
         business = Business.objects.get(name='出荷')
         lot_numbers = ':'.join([str(stock.lot_number) for stock in [stock1, stock2, stock3] if stock is not None])
         report_data = {

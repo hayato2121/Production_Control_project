@@ -115,14 +115,12 @@
         selectElement.appendChild(option);
     }
 
-    var defaultOptionValue = "";
-
     productSelect.addEventListener("change", function () {
         var selectedProduct = productSelect.value;
 
-        stock1Select.innerHTML = '<option value="">製品名を選択してください</option>';
-        stock2Select.innerHTML = '<option value="">製品名を選択してください</option>';
-        stock3Select.innerHTML = '<option value="">製品名を選択してください</option>';
+        stock1Select.innerHTML = '<option value="">在庫を選択してください</option>';
+        stock2Select.innerHTML = '<option value="">在庫を選択してください</option>';
+        stock3Select.innerHTML = '<option value="">在庫を選択してください</option>';
 
         if (selectedProduct) {
             // 選択した product に基づいて stock オプションを読み込む
@@ -144,27 +142,14 @@
         } else {
             
         }
-    });
-
-    var stockSelects = [stock1Select, stock2Select, stock3Select];
-
-    stockSelects.forEach(function (selectElement) {
-        selectElement.innerHTML = ''; // セレクトボックスをクリア
-
-        addOption(selectElement, "選択してください", ""); // "選択してください" オプションを追加
-    });
-
-    sets1Input.style.display = "none";
-    sets2Input.style.display = "none";
-    sets3Input.style.display = "none";
-
-    productSelect.addEventListener("change", function () {
-    // ここに非表示にしたい要素を操作するコードを追加
+        //setsの初期値をnoneにする
         sets1Input.style.display = "none";
         sets2Input.style.display = "none";
         sets3Input.style.display = "none";
     });
 
+
+  
     stockSelects.forEach(function (selectElement) {
         selectElement.addEventListener("change", function () {
             var setsInput = sets1Input; // ここで適切な setsInput を選択
@@ -191,12 +176,6 @@
 
 
     function updateSelectOptions(selectElement, data, selectedProduct) {
-
-        while (selectElement.firstChild) {
-            selectElement.removeChild(selectElement.firstChild);
-        }
-
-        addOption(selectElement, "選択してください", "");
 
         data.forEach(function (item) {
             if (item.product_id === selectedProduct) {
