@@ -521,7 +521,7 @@ class ReportLogoutConfirm(LoginRequiredMixin, ListView):
         today = date.today()
         user_obj = self.request.user
         if user_obj.is_authenticated:
-             qs = Report.objects.filter(user=user_obj,created_at__date = today)
+             qs = Report.objects.filter(user=user_obj, created_at__date=today)
         else:
             qs = Report.objects.none()
         return qs
