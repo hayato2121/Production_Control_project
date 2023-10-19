@@ -98,6 +98,11 @@
     var sets2Input = document.querySelector("#id_sets2");
     var sets3Input = document.querySelector("#id_sets3");
 
+    productSelect.value = localStorage.getItem('productValue') || '';
+    stock1Select.value = localStorage.getItem('stock1Value') || '';
+    stock2Select.value = localStorage.getItem('stock2Value') || '';
+    stock3Select.value = localStorage.getItem('stock3Value') || '';
+
    
     var stockSelects = [stock1Select, stock2Select, stock3Select];
 
@@ -146,7 +151,19 @@
         sets1Input.style.display = "none";
         sets2Input.style.display = "none";
         sets3Input.style.display = "none";
+        
     });
+
+    // イベントリスナーを設定して、フォームの値が変更された際にローカルストレージに保存
+    productSelect.addEventListener("change", function () {
+        localStorage.setItem('productValue', productSelect.value);
+        generateStockOptions(productSelect.value); // 選択した商品に基づいて選択肢を生成
+    });
+
+    // 初回ロード時に選択肢を生成
+    if (productSelect.value) {
+        generateStockOptions(productSelect.value);
+    }
 
 
   
@@ -174,11 +191,30 @@
         });
     });
 
+    function generateStockOptions(selectedProduct) {
+        if (selectedProduct) {
+            $.ajax({
+                url: `{% url 'daily_report:shipping_start' %}`,
+                type: "GET",
+                data: { product_id: selectedProduct },
+                success: function (data) {
+                    // サーバーからのデータをもとに選択肢を動的に生成
+                    updateSelectOptions(stock1Select, data);
+                    updateSelectOptions(stock2Select, data);
+                    updateSelectOptions(stock3Select, data);
+                },
+                error: function () {
+                    // エラーハンドリング
+                }
+            });
+        }
+    }
+
 
     function updateSelectOptions(selectElement, data, selectedProduct) {
 
         data.forEach(function (item) {
-            if (item.product_id === selectedProduct) {
+            if (item.product_id == selectedProduct) {
                 var createdDate = new Date(item.created_at);
                 var year = createdDate.getFullYear().toString().slice(-2);
                 var month = ('0' + (createdDate.getMonth() + 1)).slice(-2);
