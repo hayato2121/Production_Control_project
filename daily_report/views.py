@@ -404,9 +404,6 @@ class ShippingStartView(LoginRequiredMixin,CreateView):
 
         if shipments_required != total:
             form.add_error('sets1', '在庫選択し直してください')
-            form.add_error('sets2', '在庫選択し直してください')
-            form.add_error('sets3', '在庫選択し直してください')
-
             return self.form_invalid(form)
     
         

@@ -21,12 +21,10 @@
     <div>
         {{ form.shipments_required.label_tag }} 
         {{ form.shipments_required }}
-        {{ form.shipments_required.errors }}
     </div>
     <div>
         {{ form.shipping_day.label_tag }}
         {{ form.shipping_day }}
-        {{ form.shipping_day.errors }}
     </div>
 
     <div>
@@ -41,8 +39,6 @@
             {{ form.sets1.label_tag }} 
             <input type="number" id="id_sets1" name="sets1" style="display:none; margin-left: 10px;">
         </div>
-        {{ form.stock1.errors }}
-        {{ form.sets1.errors }}
     </div>
 
     <div>
@@ -57,8 +53,6 @@
             {{ form.sets2.label_tag }} 
             <input type="number" id="id_sets2" name="sets2" style="display:none; margin-left: 10px;">
         </div>
-        {{ form.stock2.errors }}
-        {{ form.sets2.errors }}
     </div>
     
     <div>
@@ -73,17 +67,26 @@
             {{ form.sets3.label_tag }} 
             <input type="number" id="id_sets3" name="sets3" style="display:none;margin-left: 10px;">
         </div>
-        {{ form.stock3.errors }}
-        {{ form.sets3.errors }}
     </div>
        
     <div>
         {{ form.memo.label_tag }}
         {{ form.memo }}
-        {{ form.memo.errors }}
     </div>
-    {{ forms.errors }}
+
+    {% if form.errors %}
+    <div class="custom-error-message">
+        <p><strong>-------- エラーメッセージ ----------</strong></p>
+        <ul style="list-style: none;">
+            {% for field, error in form.errors.items %}
+                <li>{{ field }}: {{ error }}</li>
+            {% endfor %}
+        </ul>
+        <p><strong>---------------------------------------</strong></p>
+    </div>
+    {% endif %}
     <input type="submit" value="出荷記録を入力する">
+
 </form>
 <p><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></p>
 
