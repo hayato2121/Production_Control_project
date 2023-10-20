@@ -198,6 +198,10 @@
                 type: "GET",
                 data: { product_id: selectedProduct },
                 success: function (data) {
+
+                    stock1Select.innerHTML = '<option value="">在庫を選択してください</option>';
+                    stock2Select.innerHTML = '<option value="">在庫を選択してください</option>';
+                    stock3Select.innerHTML = '<option value="">在庫を選択してください</option>';
                     // サーバーからのデータをもとに選択肢を動的に生成
                     updateSelectOptions(stock1Select, data);
                     updateSelectOptions(stock2Select, data);
