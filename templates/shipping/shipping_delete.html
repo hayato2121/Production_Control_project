@@ -3,7 +3,7 @@
 {% block content %}
 <h2>- 作業削除 -</h2>
 <p><strong>作業を削除してもよろしいですか？</strong></p>
-<form method="POST">
+<form method="POST" id="delete-form">
     {% csrf_token %}
     <p>製品名:{{ shipping.product.name }}</p>
     <p>製品コード: {{ shipping.product.code }}</p>
@@ -16,7 +16,19 @@
     <p>使用在庫３: {{ shipping.stock3 }}</p>
     <p>引き継ぎ: {{ shipping.memo }}</p>
     
-    <input type="submit" value="削除">
+    <input type="submit" value="削除" onclick="confirmDelete()">
 </form>
+
+
 <p><a href="{% url 'daily_report:report_list' %}">ホーム画面に戻る</a></p>
+
+<script>
+    function confirmDelete() {
+        if (confirm("作業を削除してもよろしいですか?\n***削除した場合、必ず在庫を調節してください。***")) {
+            // OKをクリックしたときに削除を実行
+            document.getElementById("delete-form").submit();
+        }
+    }
+</script>
+
 {% endblock %}

@@ -42,7 +42,11 @@
 
 <p>本日の作業を終了しますか？</p>
 
+{% if request.user.department.name == '出荷部' %}
+<p><strong>※作業を確認してからログアウトすることをお勧めします。一日経つとデータを編集できなくなります。※</strong></p>
+{% else %}
 <p><strong>※実行中の作業を終了してからログアウトすることをお勧めします。一日経つとデータを編集できなくなります。※</strong></p>
+{% endif %}
 
 <button><a href="{% url 'accounts:logout_user' %}">ログアウトします</a></button>
 <button><a href="{% url 'daily_report:report_list' %}">ログアウトしません(ホームに戻る)</a></button>
